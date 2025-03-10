@@ -7,7 +7,7 @@ import Data.List (elemIndex)
 data Route = Rou [ String ] deriving (Eq, Show)
 
 newR :: [ String ] -> Route                    -- construye una ruta segun una lista de ciudades
-newR [ ciudades ] = Rou [ ciudades ]
+newR ciudades = Rou ciudades
 
 inOrderR :: Route -> String -> String -> Bool  -- indica si la primer ciudad consultada esta antes que la segunda ciudad en la ruta
 inOrderR (Rou ciudades) ciudad_1 ciudad_2 | elemIndex ciudad_1 ciudades == Nothing || elemIndex ciudad_2 ciudades == Nothing = False
