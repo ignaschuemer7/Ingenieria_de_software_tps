@@ -6,7 +6,7 @@ import Palet
 import Stack
 import Route
 
-import Data.List (findIndices)
+-- import Data.List (findIndices)
 
 data Truck = Tru [ Stack ] Route deriving (Eq, Show)
 
@@ -14,25 +14,26 @@ newT :: Int -> Int -> Route -> Truck  -- construye un camion según una cantidad
 newT cant_bahias altura r = Tru (replicate cant_bahias (newS altura)) r -- podemos hacerlo con recursion
 
 freeCellsT :: Truck -> Int            -- responde la celdas disponibles en el camion
-freeCellsT (Tru bahias _) = sum [freeCellsS s | s <- bahias] 
+freeCellsT (Tru bahias _) = sum [freeCellsS s | s <- bahias]
 
 loadT :: Truck -> Palet -> Truck      -- carga un palet en el camion
-loadT (Tru bahias r) p | null [s | s <- bahias, holdsS s, (netS s) + (netP p) <= 10] = Tru bahias r -- no hay ningun stack en el que se puede cargar un palet
-                       | otherwise = Tru (stackS (head [s | s <- bahias, holdsS s, (netS s) + (netP p) <= 10]) p) r
+loadT (Tru bahias r) p | null (getIndices bahias p r) = Tru bahias r -- no hay ningun stack en el que se puede cargar un palet
+                      --  | not (null (filterCity bahias (getIndices bahias p r) (destinationP p))) = Tru (updateBahias bahias (head (filterCity bahias (getIndices bahias p r) (destinationP p))) p)  r
+                       | otherwise = Tru (updateBahias bahias (head (getIndices bahias p r)) p) r
 -- for cada bahia llamar a holdsS, si devuelve True en alguna llamamos a stackS
 
 
-filterFunction :: [Stack] -> [Stack]
-filterFunction stack_list = foldl holdsS (newS 0) stack_list
+getIndices :: [Stack] -> Palet -> Route -> [Int]
+getIndices stack_list p r = [n | n <- [0..(length stack_list -1)], holdsS (stack_list !! n) p r, netS (stack_list !! n) + netP p <= 10]
 
+-- filterCity :: [ Stack ] -> [Int] -> String -> [Int] 
+-- filterCity stack_list indices ciudad = [idx | idx <- indices, destinationP (head (stack_list !! idx)) == ciudad ]
 
--- filterCity :: [ Stack ] -> String -> [ Stack ] -- devuelve 
--- filterCity stack_list ciudad = findIndices (tail  == ciudad) stack_list
+updateBahias :: [Stack] -> Int -> Palet -> [Stack]
+updateBahias stack_list index p = take index stack_list ++ [stackS (stack_list !! index) p] ++ drop (index + 1) stack_list
 
-
-
-
--- unloadT :: Truck -> String -> Truck   -- responde un camion al que se le han descargado los paletes que podían descargarse en la ciudad
+unloadT :: Truck -> String -> Truck   -- responde un camion al que se le han descargado los paletes que podían descargarse en la ciudad
+unloadT (Tru bahias r) ciudad = Tru ([popS s ciudad | s <- bahias]) r
 -- una vez que se hace el unloadT en una ciudad hay que borrar la ciudad de la Route (drop 1 list_ciudades)
 
 
