@@ -1,12 +1,10 @@
 
-module Truck ( Truck, newT, freeCellsT) -- loadT, unloadT, netT )
+module Truck ( Truck, newT, freeCellsT, loadT, unloadT, netT )
   where
 
 import Palet
 import Stack
 import Route
-
--- import Data.List (findIndices)
 
 data Truck = Tru [ Stack ] Route deriving (Eq, Show)
 
@@ -16,11 +14,10 @@ newT cant_bahias altura r = Tru (replicate cant_bahias (newS altura)) r -- podem
 freeCellsT :: Truck -> Int            -- responde la celdas disponibles en el camion
 freeCellsT (Tru bahias _) = sum [freeCellsS s | s <- bahias]
 
-loadT :: Truck -> Palet -> Truck      -- carga un palet en el camion
+loadT :: Truck -> Palet -> Truck      -- carga un palet en el camion (una bahia no tolera apilar mas de 10 toneladas)
 loadT (Tru bahias r) p | null (getIndices bahias p r) = Tru bahias r -- no hay ningun stack en el que se puede cargar un palet
                       --  | not (null (filterCity bahias (getIndices bahias p r) (destinationP p))) = Tru (updateBahias bahias (head (filterCity bahias (getIndices bahias p r) (destinationP p))) p)  r
                        | otherwise = Tru (updateBahias bahias (head (getIndices bahias p r)) p) r
--- for cada bahia llamar a holdsS, si devuelve True en alguna llamamos a stackS
 
 
 getIndices :: [Stack] -> Palet -> Route -> [Int]

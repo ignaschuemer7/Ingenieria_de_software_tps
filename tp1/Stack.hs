@@ -16,14 +16,6 @@ stackS :: Stack -> Palet -> Stack         -- apila el palet indicado en la pila
 stackS (Sta palets capacidad) p | freeCellsS (Sta palets capacidad) == 0 = (Sta palets capacidad)
                                 | otherwise = Sta (p : palets) capacidad
 
--- Preguntar si hay que crear un nuevo Stack o se puede devolver el que ya está creado?
--- Por qué no se puede llamar a esta función como:
--- ghci> pila = newS 5
--- ghci> pal = newP "La Plata" 14
--- ghci> pila = stackS pila pal
--- ghci> freeCellsS pila -> acá se rompe
-
-
 netS :: Stack -> Int                      -- responde el peso neto de los paletes en la pila
 netS (Sta palets _) = sum [netP p | p <- palets]
 

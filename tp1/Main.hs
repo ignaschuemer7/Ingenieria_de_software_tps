@@ -1,54 +1,63 @@
-module Main where
-
 import Palet
 import Route
 import Stack
+import Truck
+import Control.Exception
+import System.IO.Unsafe
 
--- Función principal para testear todas las funciones
+-- Función para capturar excepciones en pruebas de error
+testF :: Show a => a -> Bool
+testF action = unsafePerformIO $ do
+    result <- tryJust isException (evaluate action)
+    return $ case result of
+        Left _ -> True
+        Right _ -> False
+    where
+        isException :: SomeException -> Maybe ()
+        isException _ = Just ()
+
+-- Definición de datos de prueba
+p1 = newP "Buenos Aires" 3
+p2 = newP "Rosario" 4
+p3 = newP "Córdoba" 5
+p4 = newP "Mendoza" 2
+
+r1 = newR ["Buenos Aires", "Rosario", "Córdoba", "Mendoza"]
+r2 = newR ["Madrid", "Barcelona", "Valencia"]
+
+s1 = newS 5
+s2 = stackS s1 p1
+s3 = stackS s2 p2
+s4 = stackS s3 p3
+s5 = stackS s4 p4
+
+t1 = newT 10 4 r1
+
+-- Lista de pruebas
+pruebas = 
+    [ -- Pruebas de Route
+      testF (newR []),  -- No debería fallar (test 1)
+      inOrderR r1 "Buenos Aires" "Córdoba" == True, -- test 2
+      inOrderR r1 "Córdoba" "Buenos Aires" == False, -- test 3
+
+      -- Pruebas de Stack
+      freeCellsS s1 == 5, -- test 4
+      freeCellsS s2 == 4, -- test 5
+      freeCellsS s5 == 1, -- test 6
+      netS s5 == 14, -- test 7
+      holdsS s1 p1 r1 == True, -- test 8
+      holdsS s2 p3 r1 == False, -- test 9
+
+      -- Pruebas de Truck
+      freeCellsT (loadT t1 p1) == 9, -- test 10
+      freeCellsT (loadT (loadT t1 p1) p2) == 8, -- test 11
+      netT (loadT (loadT (loadT t1 p1) p2) p3) == 12, -- test 12
+      freeCellsT (unloadT (loadT (loadT (loadT t1 p1) p2) p3) "Rosario") == 9, -- test 13
+      freeCellsT (unloadT (unloadT (loadT (loadT (loadT t1 p1) p2) p3) "Rosario") "Buenos Aires") == 10 -- test 14
+    ]
+
+-- Evaluación de los tests
 main :: IO ()
 main = do
-    -- Test Palet
-    let pal1 = newP "Buenos Aires" 10  -- Crear un palet
-    let pal2 = newP "Cordoba" 5
-    let pal3 = newP "Rosario" 8
-    putStrLn "Testing Palet module:"
-    putStrLn $ "Palet 1: " ++ show pal1
-    putStrLn $ "Palet 2: " ++ show pal2
-    putStrLn $ "Palet 3: " ++ show pal3
-    putStrLn $ "Destination of Palet 1: " ++ destinationP pal1  -- Ciudad destino
-    putStrLn $ "Net weight of Palet 1: " ++ show (netP pal1)  -- Peso neto
-    putStrLn $ "Destination of Palet 2: " ++ destinationP pal2  -- Ciudad destino
-    putStrLn $ "Net weight of Palet 3: " ++ show (netP pal3)  -- Peso neto
-    putStrLn ""
-
-    -- Test Route
-    let route = newR ["Buenos Aires", "Cordoba", "Rosario"]
-    putStrLn "Testing Route module:"
-    putStrLn $ "Route: " ++ show route
-    putStrLn $ "Is 'Buenos Aires' before 'Cordoba'? " ++ show (inOrderR route "Buenos Aires" "Cordoba")
-    putStrLn $ "Is 'Cordoba' before 'Buenos Aires'? " ++ show (inOrderR route "Cordoba" "Buenos Aires")
-    putStrLn ""
-
-    -- Test Stack
-    let stack1 = newS 5  -- Crear una pila con capacidad 5
-    putStrLn "Testing Stack module:"
-    putStrLn $ "Initial Stack: " ++ show stack1
-    let stack2 = stackS stack1 pal1  -- Apilar un palet
-    putStrLn $ "Stack after adding Palet 1: " ++ show stack2
-    putStrLn $ "Free cells in stack: " ++ show (freeCellsS stack2)
-    
-    let stack3 = stackS stack2 pal2  -- Apilar otro palet
-    putStrLn $ "Stack after adding Palet 2: " ++ show stack3
-    putStrLn $ "Free cells in stack: " ++ show (freeCellsS stack3)
-
-    -- Test holdsS
-    let routeForStack = newR ["Buenos Aires", "Cordoba", "Rosario"]
-    putStrLn $ "STACK 3 -- " ++ show stack3
-    putStrLn $ "Can the stack hold Palet 3 given the route? " ++ show (holdsS stack3 pal3 routeForStack)
-    putStrLn $ "Can the stack hold Palet 1 given the route? " ++ show (holdsS stack3 pal1 routeForStack)
-
-    -- Test popS
-    let stack4 = popS stack3 "Cordoba"  -- Quitar el palet con destino en Córdoba
-    putStrLn $ "Stack after popping Palet with destination 'Cordoba': " ++ show stack4
-    putStrLn $ "Free cells in stack after pop: " ++ show (freeCellsS stack4)
-
+    let resultados = zip [1..] pruebas
+    mapM_ (\(n, r) -> putStrLn $ "Test " ++ show n ++ ": " ++ (if r then "OK" else "FALLÓ")) resultados
