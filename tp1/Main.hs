@@ -31,7 +31,16 @@ s3 = stackS s2 p2
 s4 = stackS s3 p3
 s5 = stackS s4 p4
 
-t1 = newT 5 7 r1 -- 5 bahias de 7 de altura
+t1 = newT 5 7 r1
+
+t2 = newT 3 4 r2
+
+p5 = newP "Madrid" 2
+p6 = newP "Barcelona" 4
+p7 = newP "Valencia" 3
+
+p8 = newP "Madrid" 7
+
 
 -- Lista de pruebas
 pruebas = 
@@ -53,7 +62,19 @@ pruebas =
       freeCellsT (loadT (loadT t1 p1) p2) == 33, -- test 11
       netT (loadT (loadT (loadT t1 p1) p2) p3) == 12, -- test 12
       freeCellsT (unloadT (loadT (loadT (loadT t1 p1) p2) p3) "Rosario") == 33, -- test 13
-      freeCellsT (unloadT (unloadT (loadT (loadT (loadT t1 p1) p2) p3) "Rosario") "Buenos Aires") == 34 -- test 14
+      freeCellsT (unloadT (unloadT (loadT (loadT (loadT t1 p1) p2) p3) "Rosario") "Buenos Aires") == 34, -- test 14
+      
+      freeCellsT t2 == 12, -- test 15
+      netT t2 == 0, -- test 16
+      freeCellsT (loadT t2 p7) == 11, -- test 17
+      netT (loadT t2 p7) == 3, -- test 18
+      -- load p7, load p7, load p6, load p7, load p6
+      freeCellsT (loadT (loadT (loadT (loadT (loadT t2 p7) p7) p6) p7) p6) == 7, -- test 19
+      netT (loadT (loadT (loadT (loadT (loadT t2 p7) p7) p6) p7) p6) == 17, -- test 20
+      -- load p7, load p7, load p6, load p7, load p6, load p5, load p5 (solo se puede cargar en la ultima bahia y de p5)
+      freeCellsT (loadT (loadT (loadT (loadT (loadT (loadT (loadT t2 p7) p7) p6) p7) p6) p5) p5) == 5, -- test 21
+      -- load p7, load p7, load p6, load p7, load p6, load p5, load p5, load p6 (p6 no se puede cargar)
+      freeCellsT (loadT (loadT (loadT (loadT (loadT (loadT (loadT (loadT t2 p7) p7) p6) p7) p6) p5) p5) p8) == 4 -- test 22
     ]
 
 -- Evaluación de los tests

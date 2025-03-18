@@ -9,7 +9,7 @@ import Route
 data Truck = Tru [ Stack ] Route deriving (Eq, Show)
 
 newT :: Int -> Int -> Route -> Truck  -- construye un camion según una cantidad de bahias, la altura de las mismas y una ruta
-newT cant_bahias altura r = Tru (replicate cant_bahias (newS altura)) r -- podemos hacerlo con recursion
+newT cantBahias altura r = Tru (replicate cantBahias (newS altura)) r -- podemos hacerlo con recursion
 
 freeCellsT :: Truck -> Int            -- responde la celdas disponibles en el camion
 freeCellsT (Tru bahias _) = sum [freeCellsS s | s <- bahias]
@@ -21,13 +21,11 @@ loadT (Tru bahias r) p | null (getIndices bahias p r) = Tru bahias r -- no hay n
 
 
 getIndices :: [Stack] -> Palet -> Route -> [Int]
-getIndices stack_list p r = [n | n <- [0..(length stack_list -1)], holdsS (stack_list !! n) p r, netS (stack_list !! n) + netP p <= 10]
+getIndices stackList p r = [n | n <- [0..(length stackList -1)], holdsS (stackList !! n) p r, netS (stackList !! n) + netP p <= 10]
 
--- filterCity :: [ Stack ] -> [Int] -> String -> [Int] 
--- filterCity stack_list indices ciudad = [idx | idx <- indices, destinationP (head (stack_list !! idx)) == ciudad ]
 
 updateBahias :: [Stack] -> Int -> Palet -> [Stack]
-updateBahias stack_list index p = take index stack_list ++ [stackS (stack_list !! index) p] ++ drop (index + 1) stack_list
+updateBahias stackList index p = take index stackList ++ [stackS (stackList !! index) p] ++ drop (index + 1) stackList
 
 unloadT :: Truck -> String -> Truck   -- responde un camion al que se le han descargado los paletes que podían descargarse en la ciudad
 unloadT (Tru bahias r) ciudad = Tru ([popS s ciudad | s <- bahias]) r
