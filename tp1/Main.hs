@@ -31,12 +31,12 @@ s3 = stackS s2 p2
 s4 = stackS s3 p3
 s5 = stackS s4 p4
 
-t1 = newT 10 4 r1
+t1 = newT 5 7 r1 -- 5 bahias de 7 de altura
 
 -- Lista de pruebas
 pruebas = 
     [ -- Pruebas de Route
-      testF (newR []),  -- No debería fallar (test 1)
+      not (testF (newR [])),  -- No debería fallar (test 1)
       inOrderR r1 "Buenos Aires" "Córdoba" == True, -- test 2
       inOrderR r1 "Córdoba" "Buenos Aires" == False, -- test 3
 
@@ -49,11 +49,11 @@ pruebas =
       holdsS s2 p3 r1 == False, -- test 9
 
       -- Pruebas de Truck
-      freeCellsT (loadT t1 p1) == 9, -- test 10
-      freeCellsT (loadT (loadT t1 p1) p2) == 8, -- test 11
+      freeCellsT (loadT t1 p1) == 34, -- test 10
+      freeCellsT (loadT (loadT t1 p1) p2) == 33, -- test 11
       netT (loadT (loadT (loadT t1 p1) p2) p3) == 12, -- test 12
-      freeCellsT (unloadT (loadT (loadT (loadT t1 p1) p2) p3) "Rosario") == 9, -- test 13
-      freeCellsT (unloadT (unloadT (loadT (loadT (loadT t1 p1) p2) p3) "Rosario") "Buenos Aires") == 10 -- test 14
+      freeCellsT (unloadT (loadT (loadT (loadT t1 p1) p2) p3) "Rosario") == 33, -- test 13
+      freeCellsT (unloadT (unloadT (loadT (loadT (loadT t1 p1) p2) p3) "Rosario") "Buenos Aires") == 34 -- test 14
     ]
 
 -- Evaluación de los tests
