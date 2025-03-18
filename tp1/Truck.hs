@@ -9,15 +9,17 @@ import Route
 data Truck = Tru [ Stack ] Route deriving (Eq, Show)
 
 newT :: Int -> Int -> Route -> Truck  -- construye un camion según una cantidad de bahias, la altura de las mismas y una ruta
-newT cantBahias altura r = Tru (replicate cantBahias (newS altura)) r -- podemos hacerlo con recursion
+newT cantBahias altura r | cantBahias >= 0 && altura >= 0 = Tru (replicate cantBahias (newS altura)) r
+                         | otherwise = error "La cantidad de bahias y la altura deben ser mayores a 0" 
 
 freeCellsT :: Truck -> Int            -- responde la celdas disponibles en el camion
 freeCellsT (Tru bahias _) = sum [freeCellsS s | s <- bahias]
 
 loadT :: Truck -> Palet -> Truck      -- carga un palet en el camion (una bahia no tolera apilar mas de 10 toneladas)
-loadT (Tru bahias r) p | null (getIndices bahias p r) = Tru bahias r -- no hay ningun stack en el que se puede cargar un palet
-                      --  | not (null (filterCity bahias (getIndices bahias p r) (destinationP p))) = Tru (updateBahias bahias (head (filterCity bahias (getIndices bahias p r) (destinationP p))) p)  r
-                       | otherwise = Tru (updateBahias bahias (head (getIndices bahias p r)) p) r
+loadT (Tru bahias r) p | null posiblesBahias = Tru bahias r -- no hay ningun stack en el que se puede cargar un palet
+                       | otherwise = Tru (updateBahias bahias (head posiblesBahias) p) r
+                       where 
+                        posiblesBahias = getIndices bahias p r
 
 
 getIndices :: [Stack] -> Palet -> Route -> [Int]
