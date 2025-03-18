@@ -7,14 +7,14 @@ import Route
 data Stack = Sta [ Palet ] Int deriving (Eq, Show)
 
 newS :: Int -> Stack                      -- construye una Pila con la capacidad indicada 
-newS capacidad = Sta [] capacidad 
+newS = Sta [] 
 
 freeCellsS :: Stack -> Int                -- responde la celdas disponibles en la pila
-freeCellsS (Sta palets capacidad) = capacidad - length palets
+freeCellsS (Sta palets capacity) = capacity - length palets
 
 stackS :: Stack -> Palet -> Stack         -- apila el palet indicado en la pila
-stackS (Sta palets capacidad) p | freeCellsS (Sta palets capacidad) == 0 = Sta palets capacidad
-                                | otherwise = Sta (p : palets) capacidad
+stackS (Sta palets capacity) p | freeCellsS (Sta palets capacity) == 0 = Sta palets capacity
+                               | otherwise = Sta (p : palets) capacity
 
 netS :: Stack -> Int                      -- responde el peso neto de los paletes en la pila
 netS (Sta palets _) = sum [netP p | p <- palets]
@@ -24,6 +24,6 @@ holdsS (Sta [] _) p r = inRouteR r (destinationP p)
 holdsS (Sta palets _) p r = inOrderR r (destinationP p) (destinationP (head palets))
 
 popS :: Stack -> String -> Stack          -- quita del tope los paletes con destino en la ciudad indicada
-popS (Sta [] capacidad) _ = Sta [] capacidad -- si no hay palets devolvemos el mismo (vacio)
-popS (Sta (p:ps) capacidad) ciudad | destinationP p  /= ciudad = Sta (p:ps) capacidad -- condicion de corte si la ciudad destino no es la indicada
-                                   | otherwise = popS (Sta ps capacidad) ciudad -- eliminamos el elemento de arriba del stack 
+popS (Sta [] capacity) _ = Sta [] capacity -- si no hay palets devolvemos el mismo (vacio)
+popS (Sta (p:ps) capacity) city | destinationP p  /= city = Sta (p:ps) capacity -- condicion de corte si la ciudad destino no es la indicada
+                                | otherwise = popS (Sta ps capacity) city -- eliminamos el elemento de arriba del stack 
