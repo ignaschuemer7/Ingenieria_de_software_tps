@@ -24,6 +24,6 @@ holdsS (Sta [] _) p r = inRouteR r (destinationP p)
 holdsS (Sta palets _) p r = inOrderR r (destinationP p) (destinationP (head palets))
 
 popS :: Stack -> String -> Stack          -- quita del tope los paletes con destino en la ciudad indicada
-popS (Sta [] capacity) _ = Sta [] capacity -- si no hay palets devolvemos el mismo (vacio)
+popS (Sta [] capacity) _ = Sta [] capacity -- si no hay palets devolvemos lo mismo (vacio)
 popS (Sta (p:ps) capacity) city | destinationP p  /= city = Sta (p:ps) capacity -- condicion de corte si la ciudad destino no es la indicada
-                                | otherwise = popS (Sta ps capacity) city -- eliminamos el elemento de arriba del stack 
+                                | otherwise = popS (Sta ps capacity) city -- se elimina el elemento de arriba del stack y se llama recursivamente 
