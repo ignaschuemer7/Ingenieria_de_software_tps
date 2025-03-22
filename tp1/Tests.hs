@@ -109,6 +109,7 @@ tests =
       freeCellsT (loadT (loadT (loadT (loadT (loadT (loadT (loadT t2 p7) p7) p6) p7) p6) p5) p5) == 5,
 
       -- p7 + p7 + p6 + p7 + p6 + p5 + p5 + p6 = 7 cargas ya que el último palet p6 no puede ser cargado -> celdas libres = 12 - 7 = 5
+      -- El camión queda como estaba antes de intentar cargar el último palet p6. 
       freeCellsT (loadT (loadT (loadT (loadT (loadT (loadT (loadT (loadT t2 p7) p7) p6) p7) p6) p5) p5) p6) == 5,
 
 
@@ -137,6 +138,7 @@ tests =
 main :: IO ()
 main = do
     let results = zip [1..] tests
-    mapM_ (\(n, r) -> putStrLn $ "Test " ++ show n ++ ": " ++ if r then "OK" else "FAILED") results
+    -- Si se quiere ver el resultado de cada test descomentar la siguiente línea
+    -- mapM_ (\(n, r) -> putStrLn $ "Test " ++ show n ++ ": " ++ if r then "OK" else "FAILED") results
     putStrLn $ "All tests passed: " ++ show (and tests)
     return ()

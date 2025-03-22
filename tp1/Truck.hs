@@ -16,7 +16,7 @@ freeCellsT :: Truck -> Int            -- responde la celdas disponibles en el ca
 freeCellsT (Tru bays _) = sum [freeCellsS s | s <- bays]
 
 loadT :: Truck -> Palet -> Truck      -- carga un palet en el camion (una bahia no tolera apilar mas de 10 toneladas)
-loadT (Tru bays r) p | null availableBays = Tru bays r -- no hay ningun stack o bahía en el que se puede cargar un palet
+loadT (Tru bays r) p | null availableBays = Tru bays r -- no hay ningun stack o bahía en el que se puede cargar un palet. Se devuelve el camion sin cambios.
                      | otherwise = Tru (updateBays bays (head availableBays) p) r -- se carga el palet en la primera bahía disponible
                        where 
                         availableBays = getIndices bays p r
