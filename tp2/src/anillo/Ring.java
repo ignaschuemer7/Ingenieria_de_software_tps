@@ -17,12 +17,13 @@ public class Ring {
     public Ring add( Object cargo ) {
         Node newNode = new Node( cargo );
         if (current != null){
+            Node priorNode = current.getPrevious();
+
             newNode.setNext( this.current );
-            Node priorNode = current;
-            for (int i = 0; i < ringLength - 1; i++){
-                priorNode = priorNode.getNext();
-            }
-            priorNode.setNext( newNode );
+            newNode.setPrevious(priorNode);
+
+            priorNode.setNext(newNode);
+            current.setPrevious(newNode);
         }
         current = newNode;
         ringLength ++;
@@ -33,14 +34,13 @@ public class Ring {
         if (ringLength == 1){
             current = null;
         } else {
+            Node priorNode = current.getPrevious();
+            Node nextNode = current.getNext();
 
-            Node priorNode = current;
-            for (int i=0; i<ringLength - 1; i++){
-                priorNode = priorNode.getNext();
-            }
+            priorNode.setNext(nextNode);
+            nextNode.setPrevious(priorNode);
 
-            priorNode.setNext(current.getNext());
-            current = current.getNext();
+            current = nextNode;
         }
 
         ringLength--;
