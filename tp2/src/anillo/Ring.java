@@ -5,8 +5,13 @@ public class Ring {
     private Node current;
     private int ringLength;
 
+    public Ring(){
+        current = new Empty(null);
+        ringLength = 0;
+    }
+
     public Ring next() {
-        current = current.getNext();
+        current = current.getNextWithError();
         return this;
     }
 
@@ -15,22 +20,27 @@ public class Ring {
     }
 
     public Ring add( Object cargo ) {
-        Node newNode = new Node( cargo );
-        if (current != null){
-            Node priorNode = current.getPrevious();
+        Node newNode = new NoEmpty( cargo );
 
-            newNode.setNext( this.current );
-            newNode.setPrevious(priorNode);
+        newNode.setNext( this.current );
 
-            priorNode.setNext(newNode);
-            current.setPrevious(newNode);
-        }
+        Node priorNode = current.getPrevious();
+        newNode.setPrevious(priorNode);
+
+        // esto no nos cambia en el caso de que el anillo este vacío
+        // ya que le estamos seteando el siguiente al nodo empty que ya había
+        priorNode.setNext(newNode);
+        // esto no nos cambia en el caso de que el anillo este vacío
+        // ya que le estamos seteando el previo al nodo empty que ya había
+        current.setPrevious(newNode);
+
         current = newNode;
         ringLength ++;
         return this;
     }
 
     public Ring remove() {
+
         if (ringLength == 1){
             current = null;
         } else {
@@ -42,7 +52,6 @@ public class Ring {
 
             current = nextNode;
         }
-
         ringLength--;
         return this;
     }
