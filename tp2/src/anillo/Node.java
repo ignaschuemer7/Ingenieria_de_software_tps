@@ -1,7 +1,7 @@
 package anillo;
 
-public class Node {
-    private Object data;
+public abstract class Node {
+    protected Object data;
     private Node next; //preguntar si es mejor hacer un método que sea setNext en lugar de que sea público
     private Node previous;
 
@@ -12,11 +12,11 @@ public class Node {
     }
 
     public void setNext( Node n){
-        this.next = n;
+        this.next = n.getNode(this);
     }
 
     public void setPrevious( Node p ){
-        this.previous = p;
+        this.previous = p.getNode(this);
     }
 
     public Node getNext(){
@@ -27,7 +27,41 @@ public class Node {
         return previous;
     }
 
-    public Object getData() {
+    public abstract Object getData();
+
+    public abstract Node getNode( Node n);
+
+    public abstract Node getNextWithError();
+}
+
+class Empty extends Node{
+    public Empty ( Object o ){
+        super (o);
+
+    }
+    public Node getNode( Node n){
+        return n;
+    }
+    public Node getNextWithError(){
+        throw new RuntimeException("Can't get next");
+    }
+    public Object getData(){
+        throw new RuntimeException("Can't get data");
+    }
+}
+
+class NoEmpty extends Node{
+    public NoEmpty ( Object o ){
+        super (o);
+    }
+    public Node getNode( Node n){
+        return this;
+    }
+    public Node getNextWithError(){
+        return getNext();
+    }
+    public Object getData(){
         return data;
     }
+
 }
