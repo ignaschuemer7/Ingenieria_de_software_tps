@@ -1,13 +1,16 @@
 package anillo;
+import java.util.Stack;
 
 public class Ring {
 
     private Node current;
     private int ringLength;
+    private Stack<Node> stack;
 
-    public Ring(){
+    public Ring() {
         current = new Empty(null);
-        ringLength = 0;
+        stack = new Stack<>();
+        stack.push(current);
     }
 
     public Ring next() {
@@ -19,40 +22,29 @@ public class Ring {
         return current.getData();
     }
 
-    public Ring add( Object cargo ) {
-        Node newNode = new NoEmpty( cargo );
+    public Ring add(Object cargo) {
+        Node newNode = new NoEmpty(cargo);
 
-        newNode.setNext( this.current );
+        newNode.setNext(this.current);
 
         Node priorNode = current.getPrevious();
         newNode.setPrevious(priorNode);
-
-        // esto no nos cambia en el caso de que el anillo este vacío
-        // ya que le estamos seteando el siguiente al nodo empty que ya había
         priorNode.setNext(newNode);
-        // esto no nos cambia en el caso de que el anillo este vacío
-        // ya que le estamos seteando el previo al nodo empty que ya había
         current.setPrevious(newNode);
-
         current = newNode;
-        ringLength ++;
+        stack.push(current);
         return this;
     }
+
 
     public Ring remove() {
-
-        if (ringLength == 1){
-            current = null;
-        } else {
-            Node priorNode = current.getPrevious();
-            Node nextNode = current.getNext();
-
-            priorNode.setNext(nextNode);
-            nextNode.setPrevious(priorNode);
-
-            current = nextNode;
-        }
-        ringLength--;
+        this.stack.pop();
+        Node topNode = this.stack.peek();
+        current = topNode.remove( current );
         return this;
     }
+    
 }
+
+
+

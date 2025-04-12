@@ -32,6 +32,8 @@ public abstract class Node {
     public abstract Node getNode( Node n);
 
     public abstract Node getNextWithError();
+
+    public abstract Node remove( Node n );
 }
 
 class Empty extends Node{
@@ -48,6 +50,9 @@ class Empty extends Node{
     public Object getData(){
         throw new RuntimeException("Can't get data");
     }
+    public Node remove( Node n ){
+        return null;
+    }
 }
 
 class NoEmpty extends Node{
@@ -62,6 +67,16 @@ class NoEmpty extends Node{
     }
     public Object getData(){
         return data;
+    }
+    public Node remove( Node n ){
+
+        Node priorNode = n.getPrevious();
+        Node nextNode = n.getNext();
+
+        priorNode.setNext(nextNode);
+        nextNode.setPrevious(priorNode);
+
+        return nextNode;
     }
 
 }
