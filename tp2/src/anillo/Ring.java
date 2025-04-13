@@ -3,9 +3,8 @@ import java.util.Stack;
 
 public class Ring {
 
-    private Node current;
-    private int ringLength;
-    private Stack<Node> stack;
+    private Link current;
+    private Stack<Link> stack;
 
     public Ring() {
         current = new Empty(null);
@@ -14,7 +13,7 @@ public class Ring {
     }
 
     public Ring next() {
-        current = current.getNextWithError();
+        current = current.getNext();
         return this;
     }
 
@@ -23,24 +22,17 @@ public class Ring {
     }
 
     public Ring add(Object cargo) {
-        Node newNode = new NoEmpty(cargo);
-
-        newNode.setNext(this.current);
-
-        Node priorNode = current.getPrevious();
-        newNode.setPrevious(priorNode);
-        priorNode.setNext(newNode);
-        current.setPrevious(newNode);
-        current = newNode;
+        Link newLink = new NoEmpty(cargo);
+        Link topLink = stack.peek();
+        current = topLink.add(current, newLink);
         stack.push(current);
         return this;
     }
 
-
     public Ring remove() {
-        this.stack.pop();
-        Node topNode = this.stack.peek();
-        current = topNode.remove( current );
+        stack.pop();
+        Link topLink = stack.peek();
+        current = topLink.remove( current );
         return this;
     }
     
