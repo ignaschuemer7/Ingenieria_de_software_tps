@@ -5,6 +5,9 @@ public abstract class Link {
     protected Link next;
     protected Link previous;
 
+    public static final String CanNotGetNext = "Can't get next, empty ring";
+    public static final String CanNotGetData = "Can't get data, empty ring";
+
     public Link( Object o ){
         data = o;
         next = this;
@@ -21,17 +24,18 @@ public abstract class Link {
 
 }
 
-class Empty extends Link{
-    public Empty ( Object o ){
+class EmptyLink extends Link{
+    
+    public EmptyLink (Object o ){
         super (o);
     }
 
     public Link getNext(){
-        throw new RuntimeException("Can't get next");
+        throw new RuntimeException(CanNotGetNext);
     }
 
     public Object getData(){
-        throw new RuntimeException("Can't get data");
+        throw new RuntimeException(CanNotGetData);
     }
 
     public Link remove( Link n ){
@@ -44,8 +48,8 @@ class Empty extends Link{
 
 }
 
-class NonEmpty extends Link{
-    public NonEmpty ( Object o ){
+class NonEmptyLink extends Link{
+    public NonEmptyLink ( Object o ){
         super (o);
     }
 
