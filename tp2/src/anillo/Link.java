@@ -2,7 +2,7 @@ package anillo;
 
 public abstract class Link {
     protected Object data;
-    protected Link next; //preguntar si es mejor hacer un método que sea setNext en lugar de que sea público
+    protected Link next;
     protected Link previous;
 
     public Link( Object o ){
@@ -24,7 +24,6 @@ public abstract class Link {
 class Empty extends Link{
     public Empty ( Object o ){
         super (o);
-
     }
 
     public Link getNext(){
@@ -45,8 +44,8 @@ class Empty extends Link{
 
 }
 
-class NoEmpty extends Link{
-    public NoEmpty ( Object o ){
+class NonEmpty extends Link{
+    public NonEmpty ( Object o ){
         super (o);
     }
 

@@ -21,9 +21,9 @@ public class Ring {
         return current.getData();
     }
 
-    public Ring add(Object cargo) {
-        Link newLink = new NoEmpty(cargo);
-        Link topLink = stack.peek();
+    public Ring add( Object cargo ) {
+        Link newLink = new NonEmpty(cargo);
+        Link topLink = stack.peek(); // Allow to indentify how to add the new link
         current = topLink.add(current, newLink);
         stack.push(current);
         return this;
@@ -31,12 +31,9 @@ public class Ring {
 
     public Ring remove() {
         stack.pop();
-        Link topLink = stack.peek();
+        Link topLink = stack.peek(); // Allow to indentify how to remove the current link
         current = topLink.remove( current );
         return this;
     }
     
 }
-
-
-
