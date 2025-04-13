@@ -7,7 +7,7 @@ public class Ring {
     private Stack<Link> stack;
 
     public Ring() {
-        current = new Empty(null);
+        current = new EmptyLink(null);
         stack = new Stack<>();
         stack.push(current);
     }
@@ -22,7 +22,7 @@ public class Ring {
     }
 
     public Ring add( Object cargo ) {
-        Link newLink = new NonEmpty(cargo);
+        Link newLink = new NonEmptyLink(cargo);
         Link topLink = stack.peek(); // Allow to indentify how to add the new link
         current = topLink.add(current, newLink);
         stack.push(current);
