@@ -1,29 +1,30 @@
 package uno;
 
-public class NumberedCard extends ColoredCard {
+public class NumberedCard extends Card {
     private int number;
     public NumberedCard(String color, int number) {
         super(color);
         this.number = number;
     }
+    @Override
     public int getNumber() {
         return number;
     }
+
     @Override
     public void action(Game game) {
-        // Carta normal: simplemente avanza turno
         game.nextTurn();
     }
+
     @Override
     public boolean matchesNumber(Card other) {
-        if (other instanceof NumberedCard) {
-            return ((NumberedCard) other).getNumber() == this.number;
-        }
-        return false;
+        return other.matchesTypeNumberedCard(this) &&
+                other.getNumber() == this.number;
     }
+
     @Override
-    public boolean matchesType(Card other) {
-        // Los números sólo coinciden por color o número, no por tipo
-        return false;
+    public boolean matchesTypeNumberedCard(Card other) {
+        return true;
     }
+
 }

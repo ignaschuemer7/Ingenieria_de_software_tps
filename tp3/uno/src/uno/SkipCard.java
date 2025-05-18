@@ -1,6 +1,6 @@
 package uno;
 
-public class SkipCard extends ColoredCard {
+public class SkipCard extends Card {
     public SkipCard(String color) {
         super(color);
     }
@@ -11,12 +11,13 @@ public class SkipCard extends ColoredCard {
         game.nextTurn();
     }
     @Override
-    public boolean matchesNumber(Card other) {
-        return false;
-    }
-    @Override
     public boolean matchesType(Card other) {
-        return (other instanceof SkipCard);
+        return other.matchesTypeSkipCard(this);
+    }
+
+    @Override
+    public boolean matchesTypeSkipCard(Card other) {
+        return true;
     }
 }
 

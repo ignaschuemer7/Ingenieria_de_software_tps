@@ -1,6 +1,6 @@
 package uno;
 
-public class Draw2Card extends ColoredCard {
+public class Draw2Card extends Card {
     public Draw2Card(String color) {
         super(color);
     }
@@ -13,12 +13,12 @@ public class Draw2Card extends ColoredCard {
         next.addCard(game.drawCard());
         game.nextTurn();
     }
-    @Override
-    public boolean matchesNumber(Card other) {
-        return false;
-    }
+
     @Override
     public boolean matchesType(Card other) {
-        return (other instanceof Draw2Card);
+        return other.matchesTypeDraw2Card(this);
     }
+    @Override
+    public boolean matchesTypeDraw2Card(Card other) { return true; }
+
 }

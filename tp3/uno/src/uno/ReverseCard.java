@@ -1,6 +1,6 @@
 package uno;
 
-public class ReverseCard extends ColoredCard {
+public class ReverseCard extends Card {
     public ReverseCard(String color) {
         super(color);
     }
@@ -9,12 +9,14 @@ public class ReverseCard extends ColoredCard {
         game.reverseDirection();
         game.nextTurn();
     }
-    @Override
-    public boolean matchesNumber(Card other) {
-        return false;
-    }
+
     @Override
     public boolean matchesType(Card other) {
-        return (other instanceof ReverseCard);
+        return other.matchesTypeReverseCard(this);
+    }
+
+    @Override
+    public boolean matchesTypeReverseCard(Card other) {
+        return true;
     }
 }

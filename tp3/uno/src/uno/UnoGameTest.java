@@ -2,7 +2,6 @@ package uno;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.function.Executable;
-import java.util.*;
 
 public class UnoGameTest {
     private Game game;
@@ -28,19 +27,19 @@ public class UnoGameTest {
     @BeforeEach
     public void setUp() {
         // Configuración de mazo y jugadores
-        numRed5    = new NumberedCard("Rojo", 5);
-        numRed6    = new NumberedCard("Rojo", 6);
-        numBlue5   = new NumberedCard("Azul", 5);
-        numBlue6   = new NumberedCard("Azul", 6);
-        numGreen5  = new NumberedCard("Verde", 5);
-        numGreen6  = new NumberedCard("Verde", 6);
-        skipRed    = new SkipCard("Rojo");
-        revGreen   = new ReverseCard("Verde");
-        revRed    = new ReverseCard("Rojo");
-        draw2Red  = new Draw2Card("Rojo");
+        numRed5    = new NumberedCard("Red", 5);
+        numRed6    = new NumberedCard("Red", 6);
+        numBlue5   = new NumberedCard("Blue", 5);
+        numBlue6   = new NumberedCard("Blue", 6);
+        numGreen5  = new NumberedCard("Green", 5);
+        numGreen6  = new NumberedCard("Green", 6);
+        skipRed    = new SkipCard("Red");
+        revGreen   = new ReverseCard("Green");
+        revRed    = new ReverseCard("Red");
+        draw2Red  = new Draw2Card("Red");
         wild       = new WildCard();
-        numGreen7  = new NumberedCard("Verde", 7);
-        lastValid  = new NumberedCard("Rojo", 9);
+        numGreen7  = new NumberedCard("Green", 7);
+        lastValid  = new NumberedCard("Red", 9);
 
         deck = new Card[]{ //primer carta al pozo y el resto a los jugadores
                 numRed5, numRed6, numBlue5, numBlue6, numGreen5, numGreen6, skipRed, revGreen, revRed, numGreen7, draw2Red, wild, numGreen7
@@ -64,28 +63,28 @@ public class UnoGameTest {
         Card c = ana.getHand().stream()
                 .filter(ca -> ca instanceof NumberedCard)
                 .findFirst().get();
-        game.jugar("Ana", c);
+        game.playCard("Ana", c);
         assertEquals("Beto", game.getCurrentPlayer().getName());
     }
 
     @Test public void testSkipCardSkipsOnePlayer() {
         Player ana = game.getPlayers().getFirst();
         ana.addCard(skipRed);
-        game.jugar("Ana", skipRed);
+        game.playCard("Ana", skipRed);
         assertEquals("Cami", game.getCurrentPlayer().getName());
     }
 
     @Test public void testReverseCardInvertsOrder() {
         Player ana = game.getPlayers().getFirst();
         ana.addCard(revRed);
-        game.jugar("Ana", revRed);
+        game.playCard("Ana", revRed);
         assertEquals("Cami", game.getCurrentPlayer().getName());
     }
 
     @Test public void testDraw2CardMakesNextDrawAndSkip() {
         Player ana = game.getPlayers().getFirst();
         ana.addCard(draw2Red);
-        game.jugar("Ana", draw2Red);
+        game.playCard("Ana", draw2Red);
         assertEquals(handSize + 2, game.getPlayers().get(1).getHandSize());
         assertEquals("Cami", game.getCurrentPlayer().getName());
     }
@@ -93,7 +92,7 @@ public class UnoGameTest {
     @Test public void testWildCardAlwaysPlayable() {
         Player ana = game.getPlayers().getFirst();
         ana.addCard(wild);
-        assertDoesNotThrow(() -> game.jugar("Ana", wild));
+        assertDoesNotThrow(() -> game.playCard("Ana", wild.beRed()));
         assertEquals("Beto", game.getCurrentPlayer().getName());
     }
 
@@ -101,7 +100,7 @@ public class UnoGameTest {
         Player ana = game.getPlayers().getFirst();
         ana.getHand().clear();
         ana.addCard(lastValid);
-        game.jugar("Ana", lastValid);
+        game.playCard("Ana", lastValid);
         assertEquals(2, ana.getHandSize(), "Debe robar 2 cartas por no cantar UNO");
     }
 
@@ -109,13 +108,13 @@ public class UnoGameTest {
         Player ana = game.getPlayers().getFirst();
         ana.getHand().clear();
         ana.addCard(lastValid);
-        game.jugar("Ana", lastValid.callOne());
+        game.playCard("Ana", lastValid.callOne());
         assertTrue(game.isFinished(), "El juego debe terminar");
         assertEquals("Ana", game.getWinner().getName());
     }
 
     private void play(String player, Card card) {
-        game.jugar(player, card);
+        game.playCard(player, card);
     }
 
     private void assertNext(String expected) {

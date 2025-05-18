@@ -11,12 +11,13 @@ public class Player {
     public String getName() {
         return name;
     }
-    // Robar carta del mazo del juego
+
+    // Levantar carta del mazo del juego
     public void drawCard(Game game) {
         Card c = game.drawCard();
         hand.add(c);
     }
-    // Agregar carta a la mano (por efecto o configuración)
+    // Agregar carta al jugador (por efecto o configuración)
     public void addCard(Card card) {
         hand.add(card);
     }
@@ -30,9 +31,11 @@ public class Player {
     public boolean hasCard(Card card) {
         return hand.contains(card);
     }
+
     public int getHandSize() {
         return hand.size();
     }
+
     public List<Card> getHand() {
         return hand;
     }

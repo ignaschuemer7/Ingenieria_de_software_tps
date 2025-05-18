@@ -35,7 +35,7 @@ public class Game {
     // Método principal para jugar una carta de un jugador
     // Si la carta que se le pasa a Jugar es una WildCard, ya debe tener asignado un color desde los test
     // Tenemos que tener un método en wildcard que reciba una que no tiene color y cree una con color.
-    public void jugar(String playerName, Card card) {
+    public void playCard(String playerName, Card card) {
         if (finished) {
             throw new IllegalStateException("El juego ya ha terminado.");
         }
@@ -47,8 +47,8 @@ public class Game {
             throw new IllegalArgumentException("El jugador no tiene esa carta.");
         }
         // Verificar jugada válida (WildCard puede jugarse en cualquier momento)
-        if (!card.isValid(currentCard) && !(card instanceof WildCard)) {
-            throw new IllegalArgumentException("Jugada ilegal: la carta no coincide.");
+        if (!card.canStackOn(currentCard)){
+            throw new IllegalArgumentException("Jugada ilegal: la carta no es apilable.");
         }
 
         // Remover carta de la mano y colocarla como carta actual
