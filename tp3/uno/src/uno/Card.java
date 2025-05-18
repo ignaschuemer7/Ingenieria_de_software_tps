@@ -16,8 +16,9 @@ public abstract class Card {
                 lastCard.matchesType(this);
     }
     // Cantar UNO
-    public void callOne() {
+    public Card callOne() {
         oneCalled = true;
+        return this;
     }
     public boolean isOneCalled() {
         return oneCalled;

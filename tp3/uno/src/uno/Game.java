@@ -30,7 +30,6 @@ public class Game {
     // Tomar una carta del mazo y eliminarla del mazo
     public Card drawCard() {
         return deck.removeFirst();
-
     }
 
     // Método principal para jugar una carta de un jugador
@@ -58,8 +57,9 @@ public class Game {
         // Ejecutar acción de la carta
         card.action(this);
         // Penalización por no cantar UNO
-        if (currentPlayer.getHandSize() == 1 && !card.isOneCalled()) {
+        if (currentPlayer.getHandSize() == 0 && !card.isOneCalled()) {
             // Robar 2 cartas
+            // print by terminal
             currentPlayer.addCard(drawCard());
             currentPlayer.addCard(drawCard());
         }
