@@ -4,6 +4,8 @@ import java.util.*;
 public class Player {
     private String name;
     private List<Card> hand = new ArrayList<>();
+    private Player leftPlayer;
+    private Player rightPlayer;
 
     public Player(String name) {
         this.name = name;
@@ -38,5 +40,21 @@ public class Player {
 
     public List<Card> getHand() {
         return hand;
+    }
+
+    public Player getLeftPlayer() {
+        return leftPlayer;
+    }
+
+    public void setLeftPlayer(Player leftPlayer) {
+        this.leftPlayer = leftPlayer;
+    }
+
+    public Player getRightPlayer() {
+        return rightPlayer;
+    }
+
+    public void setRightPlayer(Player rightPlayer) {
+        this.rightPlayer = rightPlayer;
     }
 }
