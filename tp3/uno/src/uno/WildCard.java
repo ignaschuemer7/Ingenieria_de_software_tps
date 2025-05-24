@@ -14,6 +14,10 @@ public class WildCard extends Card {
         return this;
     }
 
+    public boolean canStackOn(Card card){
+        return true;
+    }
+
     public WildCard beRed() {
         return setColor("Red");
     }

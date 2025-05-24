@@ -18,6 +18,10 @@ public abstract class Card {
     //throw error if getNumber() is called
     public int getNumber() { throw new UnsupportedOperationException("This card does not have a number."); }
 
+    public String getColor() {
+        return color;
+    }
+
 
     public boolean matchesType(Card other) {  return false; }
 
