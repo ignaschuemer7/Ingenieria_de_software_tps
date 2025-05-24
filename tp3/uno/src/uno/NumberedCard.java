@@ -2,10 +2,12 @@ package uno;
 
 public class NumberedCard extends Card {
     private int number;
+
     public NumberedCard(String color, int number) {
         super(color);
         this.number = number;
     }
+
     @Override
     public int getNumber() {
         return number;
@@ -17,14 +19,18 @@ public class NumberedCard extends Card {
     }
 
     @Override
-    public boolean matchesNumber(Card other) {
-        return other.matchesTypeNumberedCard(this) &&
-                other.getNumber() == this.number;
+    public boolean canStackOn(Card deckCard) {
+        return deckCard.matchesNumber(this) || deckCard.matchesColor(this);
     }
 
     @Override
-    public boolean matchesTypeNumberedCard(Card other) {
-        return true;
+    public boolean matchesNumber(Card card) {
+        return card.getNumber() == this.number;
+    }
+
+    @Override
+    public boolean equals(Card c) {
+        return c.matchesNumber(this) && c.matchesColor(this);
     }
 
 }

@@ -13,7 +13,6 @@ public abstract class Card {
     // Efecto de la carta en el juego
     public abstract void action(Game game);
 
-    public boolean matchesNumber(Card other){ return false; }
 
     //throw error if getNumber() is called
     public int getNumber() { throw new UnsupportedOperationException("This card does not have a number."); }
@@ -23,23 +22,21 @@ public abstract class Card {
     }
 
 
-    public boolean matchesType(Card other) {  return false; }
-
-    public boolean matchesTypeDraw2Card(Card other) { return false; }
-    public boolean matchesTypeNumberedCard(Card other) { return false; }
-    public boolean matchesTypeSkipCard(Card other) { return false; }
-    public boolean matchesTypeReverseCard(Card other) { return false; }
-
+    public boolean matchesSymbol(Card other) { return this.getClass().getSimpleName().equals(other.getClass().getSimpleName()); }
+    public boolean matchesNumber(Card other){ return false; }
     public boolean matchesColor(Card other) {
         return this.color.equals(other.color);
     }
 
+
+//    public boolean matchesTypeDraw2Card(Card other) { return false; }
+//    public boolean matchesTypeNumberedCard(Card other) { return false; }
+//    public boolean matchesTypeSkipCard(Card other) { return false; }
+//    public boolean matchesTypeReverseCard(Card other) { return false; }
+
+
     // Validar si esta carta puede jugarse sobre lastCard
-    public boolean canStackOn(Card card) {
-        return card.matchesColor(this) ||
-                card.matchesNumber(this) ||
-                card.matchesType(this);
-    }
+    public abstract boolean canStackOn(Card card);
 
     // Cantar UNO
     public Card callOne() {
@@ -50,5 +47,7 @@ public abstract class Card {
     public boolean isOneCalled() {
         return oneCalled;
     }
+
+    public abstract boolean equals(Card c);
 
 }

@@ -52,7 +52,6 @@ public class UnoGameTest {
     }
 
 
-
     @Test public void test01InitialDeal() {
         while (true){
             Player p = game.getCurrentPlayer();
@@ -262,6 +261,15 @@ public class UnoGameTest {
         game.playCard("Beto", numGreen5);
         assertTrue(game.isFinished());
         assertEquals("Beto", game.getWinner().getName());
+    }
+
+    @Test public void test25() {
+        game.playCard("Ana", numBlue5.callOne());
+        game.playCard("Beto", new NumberedCard("Blue", 6));
+        game.playCard("Cami", numGreen6.callOne());
+        game.playCard("Ana", numRed6);
+        assertTrue(game.isFinished());
+        assertThrowsLike(() -> game.playCard("Ana", numRed7), game.GameIsOver);
     }
 
     private void play(String player, Card card) {

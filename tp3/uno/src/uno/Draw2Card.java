@@ -15,10 +15,11 @@ public class Draw2Card extends Card {
     }
 
     @Override
-    public boolean matchesType(Card other) {
-        return other.matchesTypeDraw2Card(this);
+    public boolean canStackOn(Card deckCard) {
+        return deckCard.matchesSymbol(this) || deckCard.matchesColor(this);
     }
-    @Override
-    public boolean matchesTypeDraw2Card(Card other) { return true; }
 
+    public boolean equals(Card c) {
+        return c.matchesSymbol(this) && c.matchesColor(this);
+    }
 }

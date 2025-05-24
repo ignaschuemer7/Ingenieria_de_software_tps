@@ -10,14 +10,14 @@ public class SkipCard extends Card {
         game.nextTurn();
         game.nextTurn();
     }
-    @Override
-    public boolean matchesType(Card other) {
-        return other.matchesTypeSkipCard(this);
-    }
 
     @Override
-    public boolean matchesTypeSkipCard(Card other) {
-        return true;
+    public boolean canStackOn(Card deckCard) {
+        return deckCard.matchesSymbol(this) || deckCard.matchesColor(this);
+    }
+
+    public boolean equals(Card c) {
+        return c.matchesSymbol(this) && c.matchesColor(this);
     }
 }
 

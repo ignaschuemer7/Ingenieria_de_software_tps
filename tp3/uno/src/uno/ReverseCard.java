@@ -11,12 +11,11 @@ public class ReverseCard extends Card {
     }
 
     @Override
-    public boolean matchesType(Card other) {
-        return other.matchesTypeReverseCard(this);
+    public boolean canStackOn(Card deckCard) {
+        return deckCard.matchesSymbol(this) || deckCard.matchesColor(this);
     }
 
-    @Override
-    public boolean matchesTypeReverseCard(Card other) {
-        return true;
+    public boolean equals(Card c) {
+        return c.matchesSymbol(this) && c.matchesColor(this);
     }
 }

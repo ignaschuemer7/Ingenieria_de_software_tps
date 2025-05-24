@@ -13,33 +13,37 @@ public class Game {
     public static final String GameIsOver = "The game is already over.";
     public static final String DoesNotHaveCard = "The player does not have that card.";
     public static final String NoTurn = "It is not the player's turn.";
+    public static final String PlayerHasNotCard = "The card is not in the player's hand.";
+
 
     public Game(Card[] deckArray, String[] names, int handSize) {
         this.deck = new ArrayDeque<>(Arrays.asList(deckArray));
 
         this.currentCard = deck.removeFirst();
 
-        ArrayList <Player> players = new ArrayList<>();
-        for (String name : names) {
-            Player p = new Player(name);
-            for (int i = 0; i < handSize; i++) {
-                p.addCard(drawCard());
+        Player firstPlayer = new Player(names[0]);
+        for (int i = 0; i < handSize; i++) {
+            firstPlayer.addCard(drawCard());
+        }
+
+        Player prevPlayer = firstPlayer;
+        Player currentPlayer;
+
+        for (int i = 1; i < names.length; i++) {
+            currentPlayer = new Player(names[i]);
+            for (int j = 0; j < handSize; j++) {
+                currentPlayer.addCard(drawCard());
             }
-            players.add(p);
+            prevPlayer.setRightPlayer(currentPlayer);
+            currentPlayer.setLeftPlayer(prevPlayer);
+            prevPlayer = currentPlayer;
         }
 
-        // Conectar jugadores en círculo
-        int numPlayers = players.size();
-        for (int i = 0; i < numPlayers; i++) {
-            Player current = players.get(i);
-            Player left = players.get((i - 1 + numPlayers) % numPlayers);
-            Player right = players.get((i + 1) % numPlayers);
-            current.setLeftPlayer(left);
-            current.setRightPlayer(right);
-        }
+        // Cerrar el círculo
+        prevPlayer.setRightPlayer(firstPlayer);
+        firstPlayer.setLeftPlayer(prevPlayer);
 
-        // Establecer jugador inicial
-        this.currentPlayer = players.getFirst();
+        this.currentPlayer = firstPlayer;
     }
 
     // Tomar una carta del mazo y eliminarla del mazo

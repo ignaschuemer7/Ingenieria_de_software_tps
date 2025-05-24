@@ -21,14 +21,24 @@ public class Player {
 
     // Quitar carta de la mano (por jugarla)
     public void removeCard(Card card) {
-        if (!hand.remove(card)) {
-            throw new IllegalArgumentException("La carta no está en la mano del jugador.");
-        }
+        hand.stream()
+                .filter(c -> c.equals(card))
+                .findFirst()
+                .map(c -> { hand.remove(c); return c; })
+                .orElseThrow(() -> new IllegalArgumentException(Game.PlayerHasNotCard));
     }
 
     // Comprobar si la mano contiene la carta
+//    public boolean hasCard(Card card) {
+//        return hand.contains(card);
+//    }
     public boolean hasCard(Card card) {
-        return hand.contains(card);
+        for (Card c : hand) {
+            if (c.equals(card)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public int getHandSize() {

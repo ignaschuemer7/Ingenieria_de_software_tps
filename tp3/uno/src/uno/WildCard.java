@@ -4,6 +4,7 @@ public class WildCard extends Card {
     public WildCard() {
         super(null);
     }
+
     @Override
     public void action(Game game) {
         game.nextTurn();
@@ -14,8 +15,13 @@ public class WildCard extends Card {
         return this;
     }
 
-    public boolean canStackOn(Card card){
+    @Override
+    public boolean canStackOn(Card deckCard){
         return true;
+    }
+
+    public boolean equals(Card c) {
+        return c.matchesColor(this);
     }
 
     public WildCard beRed() {
