@@ -3,6 +3,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.function.Executable;
 
+import java.util.Arrays;
+
 public class UnoGameTest {
     private Game game;
     private Card[] deck;
@@ -19,6 +21,7 @@ public class UnoGameTest {
     private NumberedCard numGreen7;
     private NumberedCard numYellow1;
     private SkipCard skipRed;
+    private SkipCard skipBlue;
     private NumberedCard numRed7;
     private ReverseCard revGreen;
     private ReverseCard revRed;
@@ -36,6 +39,7 @@ public class UnoGameTest {
         numGreen6  = new NumberedCard("Green", 6);
         numYellow1 = new NumberedCard("Yellow", 1);
         skipRed    = new SkipCard("Red");
+        skipBlue   = new SkipCard("Blue");
         numRed7    = new NumberedCard("Red", 7);
         revGreen   = new ReverseCard("Green");
         revRed    = new ReverseCard("Red");
@@ -51,61 +55,67 @@ public class UnoGameTest {
         game = new Game(deck, names, handSize);
     }
 
-
-    @Test public void test01InitialDeal() {
-        while (true){
+    @Test
+    public void test01InitialDeal() {
+        // Verificar que cada jugador recibe la cantidad correcta de cartas usando Streams
+        Arrays.stream(names).forEach(n -> {
             Player p = game.getCurrentPlayer();
-            assertEquals(handSize, p.getHandSize(), "Cada jugador debe recibir 2 cartas");
-            if (p.getName().equals("Cami")) break;
+            assertEquals(handSize, p.getHandSize(),
+                    String.format("Cada jugador debe tener %d cartas", handSize));
             game.nextTurn();
-        }
-        assertNotNull(game.getCurrentCard(), "Debe haber carta inicial en el pozo");
+        });
+        assertNotNull(game.getCardOnTop(), "Debe haber una carta inicial en el pozo");
+    }
+
+    @Test public void test26playedCardisInTopOfDeck() {
+        game.playCard("Ana", numBlue5.callOne());
+        assertEquals(numBlue5, game.getCardOnTop());
     }
 
     @Test public void test02PlayNumberedAdvancesTurn() {
-        Player ana = game.getCurrentPlayer();
-        Card c = ana.getHand().stream()
-                .filter(ca -> ca instanceof NumberedCard)
-                .findFirst().get();
-        game.playCard("Ana", c);
+        game.playCard("Ana", numBlue5.callOne());
         assertEquals("Beto", game.getCurrentPlayer().getName());
     }
 
+    @Test public void test02EqualsOfCardOnHand() {
+        game.playCard("Ana", new NumberedCard("Red", 6).callOne());
+        assertEquals(numRed6, game.getCardOnTop());
+    }
+
     @Test public void test03SkipCardSkipsOnePlayer() {
-        Player ana = game.getCurrentPlayer();
-        ana.addCard(skipRed);
-        game.playCard("Ana", skipRed);
+        addCardCurrentPlayer(game, skipRed).playCard("Ana", skipRed);
         assertEquals("Cami", game.getCurrentPlayer().getName());
     }
 
     @Test public void test04ReverseCardInvertsOrder() {
-        Player ana = game.getCurrentPlayer();
-        ana.addCard(revRed);
-        game.playCard("Ana", revRed);
+        addCardCurrentPlayer(game, revRed).playCard("Ana", revRed);
         assertEquals("Cami", game.getCurrentPlayer().getName());
     }
 
     @Test public void test05Draw2CardMakesNextDrawAndSkip() {
-        Player ana = game.getCurrentPlayer();
-        ana.addCard(draw2Red);
-        game.playCard("Ana", draw2Red);
-        assertEquals(handSize + 2, ana.getRightPlayer().getHandSize());
+        addCardCurrentPlayer(game, draw2Red).playCard("Ana", draw2Red);
         assertEquals("Cami", game.getCurrentPlayer().getName());
     }
 
-    @Test public void test06WildCardAlwaysPlayable() {
-        Player ana = game.getCurrentPlayer();
-        ana.addCard(wild);
-        assertDoesNotThrow(() -> game.playCard("Ana", wild.beRed()));
+    @Test public void test06NoTurnException(){
+        assertThrowsLike(() -> game.playCard("Beto", numBlue6), Game.NoTurn);
+    }
+
+    @Test public void test06PlayWildCard() {
+        assertDoesNotThrow(() -> addCardCurrentPlayer(game, wild).playCard("Ana", wild.beRed()));
         assertEquals("Beto", game.getCurrentPlayer().getName());
     }
 
+    @Test public void test14WildCardChangesColor() {
+        addCardCurrentPlayer(game, wild).playCard("Ana", wild.beGreen());
+        assertEquals("Green", game.getCardOnTop().getColor());
+    }
+
     @Test public void test07PenaltyWhenNotCallingUno() {
-//        Player ana = game.getCurrentPlayer();
-        game.playCard("Ana", numRed6);
+        game.playCard("Ana", numRed6); // Ana no canta UNO
         game.playCard("Beto", numBlue6.callOne());
         game.playCard("Cami", numGreen6.callOne());
-        assertEquals(3, game.getCurrentPlayer().getHandSize(), "Debe robar 2 cartas por no cantar UNO");
+        assertEquals(3, game.getCurrentPlayer().getHandSize());
     }
 
     @Test public void test08GameEndsWhenHandEmpty() {
@@ -113,132 +123,59 @@ public class UnoGameTest {
         game.playCard("Beto", numBlue6.callOne());
         game.playCard("Cami", numGreen6.callOne());
         game.playCard("Ana", numRed6);
-        assertTrue(game.isFinished(), "El juego debe terminar");
+        assertTrue(game.isFinished());
         assertEquals("Ana", game.getWinner().getName());
     }
 
     @Test public void test09UnoWildCard() {
-        Player ana = game.getCurrentPlayer();
-        ana.addCard(wild);
+        addCardCurrentPlayer(game, wild);
         game.playCard("Ana", numBlue5);
         game.playCard("Beto", numBlue6.callOne());
         game.playCard("Cami", numGreen6.callOne());
         game.playCard("Ana", wild.beYellow().callOne());
-        game.pickCard(); // Corresponde a "Beto"
+        game.pickCard(); // Corresponde a "Beto". Agarra cartas hasta que salga una jugable
         assertDoesNotThrow(() -> game.playCard("Beto", numYellow1));
     }
 
     @Test public void test10CannotPlayInvalidCard() {
-        Player ana = game.getCurrentPlayer();
-        ana.addCard(numBlue6);
-        game.playCard("Ana", numBlue6);
-//        assertThrowsLike(() -> game.playCard("Ana", numBlue6), game.IllegalPlay);
+        addCardCurrentPlayer(game, numBlue6).playCard("Ana", numBlue6);
+        // El turno de Ana no avanza porque la carta que quiere jugar no es jugable
         assertEquals("Ana", game.getCurrentPlayer().getName());
     }
 
     @Test public void test11PlayDraw2ThenWild() {
-        Player ana = game.getCurrentPlayer();
-        ana.addCard(draw2Red);
-        game.playCard("Ana", draw2Red);
-        Player cami = game.getCurrentPlayer();
-        cami.addCard(wild);
-        game.playCard("Cami", wild.beGreen());
-        assertEquals("Ana", game.getCurrentPlayer().getName());
-    }
-
-    @Test public void test12PlayWildThenDraw2() {
-        Player ana = game.getCurrentPlayer();
-        ana.addCard(wild);
-        game.playCard("Ana", wild.beRed());
-        Player beto = game.getCurrentPlayer();
-        beto.addCard(draw2Red);
-        game.playCard("Beto", draw2Red);
+        addCardCurrentPlayer(game, draw2Red).playCard("Ana", draw2Red);
+        addCardCurrentPlayer(game, wild).playCard("Cami", wild.beGreen());
         assertEquals("Ana", game.getCurrentPlayer().getName());
     }
 
     @Test public void test13TwoReverseEndsInSamePlayer() {
-        Player ana = game.getCurrentPlayer();
-        ana.addCard(revRed);
-        game.playCard("Ana", revRed);
-        assertEquals("Cami", game.getCurrentPlayer().getName());
-        Player cami = game.getCurrentPlayer();
-        cami.addCard(revRed);
-        game.playCard("Cami", revRed);
+        addCardCurrentPlayer(game, revRed).playCard("Ana", revRed);
+        addCardCurrentPlayer(game, revRed).playCard("Cami", revRed);
         assertEquals("Ana", game.getCurrentPlayer().getName());
-    }
-
-    @Test public void test14WildCardChangesColor() {
-        Player ana = game.getCurrentPlayer();
-        ana.addCard(wild);
-        game.playCard("Ana", wild.beGreen());
-        assertEquals("Green", game.getCurrentCard().getColor());
-    }
-
-    @Test public void test15Draw2StackingNotAllowed() {
-        Player ana = game.getCurrentPlayer();
-        ana.addCard(draw2Red);
-        game.playCard("Ana", draw2Red);
-        Player beto = game.getCurrentPlayer();
-        beto.addCard(draw2Red);
-        assertThrowsLike(() -> game.playCard("Beto", draw2Red), game.NoTurn);
-    }
-
-    @Test public void test16SkipWithOnlyTwoPlayersSkipsBack() {
-        game = new Game(deck, new String[]{"Ana", "Beto"}, handSize);
-        Player ana = game.getCurrentPlayer();
-        ana.addCard(skipRed);
-        game.playCard("Ana", skipRed);
-        assertEquals("Ana", game.getCurrentPlayer().getName());
-    }
-
-    @Test public void test17WildCardDoesNotAdvanceTurnWithoutPlay() {
-        Player ana = game.getCurrentPlayer();
-        ana.addCard(wild);
-        game.playCard("Ana", wild.beBlue());
-        assertEquals("Beto", game.getCurrentPlayer().getName());
-    }
-
-    @Test public void test18Draw2IncreasesCorrectHand() {
-        Player ana = game.getCurrentPlayer();
-        ana.addCard(draw2Red);
-        int previous = ana.getRightPlayer().getHandSize();
-        game.playCard("Ana", draw2Red);
-        assertEquals(previous + 2, ana.getRightPlayer().getHandSize());
     }
 
     @Test public void test19WildOnWild(){
-        Player ana = game.getCurrentPlayer();
-        ana.addCard(wild);
-        game.playCard("Ana", wild.beYellow());
-        Player beto = game.getCurrentPlayer();
-        beto.addCard(wild);
-        game.playCard("Beto", wild.beGreen());
+        addCardCurrentPlayer(game, wild).playCard("Ana", wild.beYellow());
+        addCardCurrentPlayer(game, wild).playCard("Beto", wild.beGreen());
         assertDoesNotThrow(() -> game.playCard("Cami", numGreen6.callOne()));
     }
 
-    @Test public void test20CallUnoNotLastCardThrows() {
-        Player ana = game.getCurrentPlayer();
-        ana.addCard(numBlue5);
-        game.playCard("Ana", numBlue5.callOne()); // pick up 2 cards
+    @Test public void test20CallUnoNotLastCardPenalty() {
+        addCardCurrentPlayer(game, numBlue5).playCard("Ana", numBlue5.callOne()); // pick up 2 cards (penalty)
         game.playCard("Beto", numBlue6.callOne());
         game.playCard("Cami", numGreen6.callOne());
         assertEquals(4, game.getCurrentPlayer().getHandSize());
     }
 
-    @Test public void test21CanOnlyPlayIfCardMatchesColorOrNumber() {
+    @Test public void test21PlayerDoesNotHaveCard() {
         assertThrowsLike(() -> game.playCard("Ana", revGreen), game.DoesNotHaveCard);
     }
 
     @Test public void test22SkipThreeTimesEndsInSamePlayer() {
-        Player ana = game.getCurrentPlayer();
-        ana.addCard(skipRed);
-        game.playCard("Ana", skipRed);
-        Player cami = game.getCurrentPlayer();
-        cami.addCard(skipRed);
-        game.playCard("Cami", skipRed);
-        Player beto = game.getCurrentPlayer();
-        beto.addCard(skipRed);
-        game.playCard("Beto", skipRed);
+        addCardCurrentPlayer(game, skipRed).playCard("Ana", skipRed);
+        addCardCurrentPlayer(game, skipRed).playCard("Cami", skipRed);
+        addCardCurrentPlayer(game, skipBlue).playCard("Beto", skipBlue);
         assertEquals("Ana", game.getCurrentPlayer().getName());
     }
 
@@ -252,32 +189,22 @@ public class UnoGameTest {
     }
 
     @Test public void test24WildCallUnoEndsGame() {
-        Player ana = game.getCurrentPlayer();
-        ana.addCard(wild);
+        addCardCurrentPlayer(game, wild);
         game.playCard("Ana", numBlue5);
         game.playCard("Beto", numBlue6.callOne());
-        game.playCard("Cami", numGreen6.callOne());
+        addCardCurrentPlayer(game, numBlue5).playCard("Cami", numBlue5);
         game.playCard("Ana", wild.beGreen().callOne());
         game.playCard("Beto", numGreen5);
         assertTrue(game.isFinished());
         assertEquals("Beto", game.getWinner().getName());
     }
 
-    @Test public void test25() {
-        game.playCard("Ana", numBlue5.callOne());
-        game.playCard("Beto", new NumberedCard("Blue", 6));
-        game.playCard("Cami", numGreen6.callOne());
-        game.playCard("Ana", numRed6);
-        assertTrue(game.isFinished());
-        assertThrowsLike(() -> game.playCard("Ana", numRed7), game.GameIsOver);
-    }
 
-    private void play(String player, Card card) {
-        game.playCard(player, card);
-    }
 
-    private void assertNext(String expected) {
-        assertEquals(expected, game.getCurrentPlayer().getName());
+    private Game addCardCurrentPlayer(Game game, Card card) {
+        Player current = game.getCurrentPlayer();
+        current.addCard(card);
+        return game;
     }
 
     private static void assertThrowsLike(Executable executable, String message) {

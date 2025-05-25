@@ -15,13 +15,16 @@ public class Player {
         hand.add(card);
     }
 
-    public void removeCard(Card card) {
-        hand.stream()
+    public Card removeCard(Card card) {
+        Card found = hand.stream()
                 .filter(c -> c.equals(card))
                 .findFirst()
-                .map(c -> { hand.remove(c); return c; })
                 .orElseThrow(() -> new IllegalArgumentException(Game.PlayerHasNotCard));
+
+        hand.remove(found);
+        return found;
     }
+
 
     public void setRightPlayer(Player rightPlayer) { this.rightPlayer = rightPlayer; }
 

@@ -4,7 +4,7 @@ import java.util.*;
 
 public class Game {
     private Player currentPlayer;
-    private Card currentCard;
+    private Card cardOnTop;
     private final Deque<Card> deck;
     private boolean finished = false;
     private Player winner;
@@ -18,7 +18,7 @@ public class Game {
 
     public Game(Card[] deckArray, String[] names, int handSize) {
         this.deck = new ArrayDeque<>(Arrays.asList(deckArray));
-        this.currentCard = deck.removeFirst();
+        this.cardOnTop = deck.removeFirst();
         // Creamos la ronda de jugadores
         Player firstPlayer = new Player(names[0]);
         for (int i = 0; i < handSize; i++) {
@@ -48,10 +48,9 @@ public class Game {
 
         if (!currentPlayer.hasCard(card)) { throw new IllegalArgumentException(DoesNotHaveCard); }
 
-        if (!card.canStackOn(currentCard)){ return; } // Si no se puede apilar, el estado de la partida no cambia
+        if (!card.canStackOn(cardOnTop)){ return; } // Si no se puede apilar, el estado de la partida no cambia
 
-        currentPlayer.removeCard(card);
-        currentCard = card;
+        cardOnTop = currentPlayer.removeCard(card);
         // Penalización por no cantar UNO o Cantar UNO sin tener una sola carta
         if (currentPlayer.getHandSize() == 1 && !card.isOneCalled() ||
                 (card.isOneCalled() && currentPlayer.getHandSize() != 1)) {
@@ -71,7 +70,7 @@ public class Game {
     public void pickCard() {
         Card card = drawCard();
         currentPlayer.addCard(card);
-        if (card.canStackOn(currentCard)){ return; }
+        if (card.canStackOn(cardOnTop)){ return; }
         pickCard();
     }
 
@@ -98,6 +97,6 @@ public class Game {
 
     public boolean isFinished() {      return finished; }
     public Player getCurrentPlayer() { return currentPlayer; }
-    public Card getCurrentCard() {     return currentCard; }
+    public Card getCardOnTop() {       return cardOnTop; }
     public Player getWinner() {        return winner; }
 }
