@@ -42,34 +42,28 @@ public class Game {
     }
 
     public void playCard(String playerName, Card card) {
-        if (finished) {
-            throw new IllegalStateException(GameIsOver);
-        }
-        if (!currentPlayer.getName().equals(playerName)) {
-            throw new IllegalArgumentException(NoTurn);
-        }
-        if (!currentPlayer.hasCard(card)) {
-            throw new IllegalArgumentException(DoesNotHaveCard);
-        }
-        if (!card.canStackOn(currentCard)){
-            // Si la carta no es jugable, el estado de la partida no cambia
-            return;
-        }
+        if (finished) { throw new IllegalStateException(GameIsOver); }
+
+        if (!currentPlayer.getName().equals(playerName)) { throw new IllegalArgumentException(NoTurn); }
+
+        if (!currentPlayer.hasCard(card)) { throw new IllegalArgumentException(DoesNotHaveCard); }
+
+        if (!card.canStackOn(currentCard)){ return; } // Si no se puede apilar, el estado de la partida no cambia
+
         currentPlayer.removeCard(card);
         currentCard = card;
         // Penalización por no cantar UNO o Cantar UNO sin tener una sola carta
         if (currentPlayer.getHandSize() == 1 && !card.isOneCalled() ||
                 (card.isOneCalled() && currentPlayer.getHandSize() != 1)) {
-            // Robar 2 cartas
             currentPlayer.addCard(drawCard());
             currentPlayer.addCard(drawCard());
         }
-        // Verificar fin de juego (mano vacía)
-        if (currentPlayer.getHandSize() == 0) {
+
+        if (currentPlayer.getHandSize() == 0) { // No tiene más cartas, termina el juego
             finished = true;
             winner = currentPlayer;
         }
-        // Efecto de la carta sobre el juego
+
         card.action(this);
     }
 
@@ -81,18 +75,10 @@ public class Game {
         pickCard();
     }
 
-    public Card drawCard() {
-        return deck.removeFirst();
-    }
-
+    public Card drawCard() { return deck.removeFirst(); }
 
     public Game nextTurn() {
         currentPlayer = controller.next(currentPlayer);
-        return this;
-    }
-
-    public Game reverseDirection() {
-        controller = controller.switchController();
         return this;
     }
 
@@ -105,8 +91,13 @@ public class Game {
         return this;
     }
 
-    public boolean isFinished() { return finished; }
+    public Game reverseDirection() {
+        controller = controller.switchController();
+        return this;
+    }
+
+    public boolean isFinished() {      return finished; }
     public Player getCurrentPlayer() { return currentPlayer; }
-    public Card getCurrentCard() { return currentCard; }
-    public Player getWinner() { return winner; }
+    public Card getCurrentCard() {     return currentCard; }
+    public Player getWinner() {        return winner; }
 }
