@@ -19,7 +19,6 @@ public class Game {
     public Game(Card[] deckArray, String[] names, int handSize) {
         this.deck = new ArrayDeque<>(Arrays.asList(deckArray));
         this.currentCard = deck.removeFirst();
-
         // Creamos la ronda de jugadores
         Player firstPlayer = new Player(names[0]);
         for (int i = 0; i < handSize; i++) {
@@ -106,20 +105,8 @@ public class Game {
         return this;
     }
 
-    public Player getCurrentPlayer() {
-        return currentPlayer;
-    }
-
-    public Card getCurrentCard() {
-        return currentCard;
-    }
-
-    public boolean isFinished() {
-        return finished;
-    }
-
-    public Player getWinner() {
-        return winner;
-    }
-
+    public boolean isFinished() { return finished; }
+    public Player getCurrentPlayer() { return currentPlayer; }
+    public Card getCurrentCard() { return currentCard; }
+    public Player getWinner() { return winner; }
 }
