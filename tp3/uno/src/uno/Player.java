@@ -10,16 +10,11 @@ public class Player {
     public Player(String name) {
         this.name = name;
     }
-    public String getName() {
-        return name;
-    }
 
-    // Agregar carta al jugador (por efecto o configuración)
     public void addCard(Card card) {
         hand.add(card);
     }
 
-    // Quitar carta de la mano (por jugarla)
     public void removeCard(Card card) {
         hand.stream()
                 .filter(c -> c.equals(card))
@@ -28,40 +23,20 @@ public class Player {
                 .orElseThrow(() -> new IllegalArgumentException(Game.PlayerHasNotCard));
     }
 
-    // Comprobar si la mano contiene la carta
-//    public boolean hasCard(Card card) {
-//        return hand.contains(card);
-//    }
-    public boolean hasCard(Card card) {
-        for (Card c : hand) {
-            if (c.equals(card)) {
-                return true;
-            }
-        }
-        return false;
-    }
+    public void setRightPlayer(Player rightPlayer) { this.rightPlayer = rightPlayer; }
 
-    public int getHandSize() {
-        return hand.size();
-    }
+    public void setLeftPlayer(Player leftPlayer) { this.leftPlayer = leftPlayer; }
 
-    public List<Card> getHand() {
-        return hand;
-    }
+    public Player getLeftPlayer() { return leftPlayer; }
 
-    public Player getLeftPlayer() {
-        return leftPlayer;
-    }
+    public Player getRightPlayer() { return rightPlayer; }
 
-    public void setLeftPlayer(Player leftPlayer) {
-        this.leftPlayer = leftPlayer;
-    }
+    public boolean hasCard(Card card) { return hand.stream().anyMatch(c -> c.equals(card)); }
 
-    public Player getRightPlayer() {
-        return rightPlayer;
-    }
+    public String getName() { return name; }
 
-    public void setRightPlayer(Player rightPlayer) {
-        this.rightPlayer = rightPlayer;
-    }
+    public int getHandSize() { return hand.size(); }
+
+    public List<Card> getHand() { return hand; }
+
 }

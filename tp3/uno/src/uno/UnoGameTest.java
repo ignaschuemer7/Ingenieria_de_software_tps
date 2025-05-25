@@ -124,7 +124,7 @@ public class UnoGameTest {
         game.playCard("Beto", numBlue6.callOne());
         game.playCard("Cami", numGreen6.callOne());
         game.playCard("Ana", wild.beYellow().callOne());
-        game.pickCard("Beto");
+        game.pickCard(); // Corresponde a "Beto"
         assertDoesNotThrow(() -> game.playCard("Beto", numYellow1));
     }
 

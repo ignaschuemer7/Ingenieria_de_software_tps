@@ -9,28 +9,17 @@ public class NumberedCard extends Card {
     }
 
     @Override
-    public int getNumber() {
-        return number;
-    }
+    public boolean canStackOn(Card deckCard) { return deckCard.matchesNumber(this) || deckCard.matchesColor(this); }
 
     @Override
-    public void action(Game game) {
-        game.nextTurn();
-    }
+    public void action(Game game) { game.nextTurn(); }
 
     @Override
-    public boolean canStackOn(Card deckCard) {
-        return deckCard.matchesNumber(this) || deckCard.matchesColor(this);
-    }
+    public boolean matchesNumber(Card card) { return card.getNumber() == this.number; }
 
     @Override
-    public boolean matchesNumber(Card card) {
-        return card.getNumber() == this.number;
-    }
+    public boolean equals(Card c) { return c.matchesNumber(this) && c.matchesColor(this); }
 
     @Override
-    public boolean equals(Card c) {
-        return c.matchesNumber(this) && c.matchesColor(this);
-    }
-
+    public int getNumber() { return number; }
 }
