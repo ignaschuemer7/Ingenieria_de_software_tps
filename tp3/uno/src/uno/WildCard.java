@@ -33,6 +33,6 @@ public class WildCard extends Card {
 
     @Override
     public boolean equals(Card c) {
-        return c.matchesColor(this);
+        return c.matchesSymbol(this);
     }
 }

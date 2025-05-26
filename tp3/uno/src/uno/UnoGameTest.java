@@ -199,8 +199,6 @@ public class UnoGameTest {
         assertEquals("Beto", game.getWinner().getName());
     }
 
-
-
     private Game addCardCurrentPlayer(Game game, Card card) {
         Player current = game.getCurrentPlayer();
         current.addCard(card);
