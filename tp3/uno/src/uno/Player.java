@@ -19,12 +19,11 @@ public class Player {
         Card found = hand.stream()
                 .filter(c -> c.equals(card))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException(Game.PlayerHasNotCard));
+                .orElseThrow(() -> new IllegalArgumentException(Game.DoesNotHaveCard));
 
         hand.remove(found);
         return found;
     }
-
 
     public void setRightPlayer(Player rightPlayer) { this.rightPlayer = rightPlayer; }
 

@@ -13,7 +13,6 @@ public class Game {
     public static final String GameIsOver = "The game is already over.";
     public static final String DoesNotHaveCard = "The player does not have that card.";
     public static final String NoTurn = "It is not the player's turn.";
-    public static final String PlayerHasNotCard = "The card is not in the player's hand.";
     public static final String NoNumberedCard = "This card does not have a number.";
 
     public Game(Card[] deckArray, String[] names, int handSize) {
@@ -62,7 +61,6 @@ public class Game {
             finished = true;
             winner = currentPlayer;
         }
-
         card.action(this);
     }
 

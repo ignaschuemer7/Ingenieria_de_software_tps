@@ -11,14 +11,12 @@ public class UnoGameTest {
     private String[] names;
     private int handSize;
 
-    // Cartas de prueba
     private NumberedCard numRed5;
     private NumberedCard numRed6;
     private NumberedCard numBlue5;
     private NumberedCard numBlue6;
     private NumberedCard numGreen5;
     private NumberedCard numGreen6;
-    private NumberedCard numGreen7;
     private NumberedCard numYellow1;
     private SkipCard skipRed;
     private SkipCard skipBlue;
@@ -30,7 +28,6 @@ public class UnoGameTest {
 
     @BeforeEach
     public void setUp() {
-        // Configuración de mazo y jugadores
         numRed5    = new NumberedCard("Red", 5);
         numRed6    = new NumberedCard("Red", 6);
         numBlue5   = new NumberedCard("Blue", 5);
@@ -45,26 +42,33 @@ public class UnoGameTest {
         revRed    = new ReverseCard("Red");
         draw2Red  = new Draw2Card("Red");
         wild       = new WildCard();
-        numGreen7  = new NumberedCard("Green", 7);
 
-        deck = new Card[]{ //primer carta al pozo y el resto a los jugadores
-                numRed5, numRed6, numBlue5, numBlue6, numGreen5, numGreen6, skipRed, numRed7, revGreen, revRed, numYellow1, numGreen7, draw2Red, wild, numGreen7
-        };
         names = new String[]{"Ana", "Beto", "Cami"};
         handSize = 2;
+
+        deck = new Card[]{
+                numRed5, numRed6, numBlue5, numBlue6, numGreen5, numGreen6,
+                skipRed, numRed7, revGreen, revRed, numYellow1
+        };
+        /*
+          Primer carta al pozo.
+          Las primeras #handSize cartas del mazo son para el primer jugador.
+          Las siguientes #handSize cartas son para el segundo jugador.
+          Y así sucesivamente.
+          El resto de las cartas son para el mazo.
+        */
         game = new Game(deck, names, handSize);
     }
 
     @Test
     public void test01InitialDeal() {
-        // Verificar que cada jugador recibe la cantidad correcta de cartas usando Streams
-        Arrays.stream(names).forEach(n -> {
-            Player p = game.getCurrentPlayer();
-            assertEquals(handSize, p.getHandSize(),
-                    String.format("Cada jugador debe tener %d cartas", handSize));
-            game.nextTurn();
-        });
-        assertNotNull(game.getCardOnTop(), "Debe haber una carta inicial en el pozo");
+        assertEquals(game.getCardOnTop(), numRed5);
+        assertEquals(game.getCurrentPlayer().getHand(), Arrays.asList(numRed6, numBlue5));
+        assertEquals("Ana", game.getCurrentPlayer().getName());
+        assertEquals(game.nextTurn().getCurrentPlayer().getHand(), Arrays.asList(numBlue6, numGreen5));
+        assertEquals("Beto", game.getCurrentPlayer().getName());
+        assertEquals(game.nextTurn().getCurrentPlayer().getHand(), Arrays.asList(numGreen6, skipRed));
+        assertEquals("Cami", game.getCurrentPlayer().getName());
     }
 
     @Test public void test02playedCardisInTopOfDeck() {
@@ -169,7 +173,7 @@ public class UnoGameTest {
     }
 
     @Test public void test19PlayerDoesNotHaveCard() {
-        assertThrowsLike(() -> game.playCard("Ana", revGreen), game.DoesNotHaveCard);
+        assertThrowsLike(() -> game.playCard("Ana", revGreen), Game.DoesNotHaveCard);
     }
 
     @Test public void test20SkipThreeTimesEndsInSamePlayer() {
@@ -185,7 +189,7 @@ public class UnoGameTest {
         game.playCard("Cami", numGreen6.callOne());
         game.playCard("Ana", numRed6);
         assertTrue(game.isFinished());
-        assertThrowsLike(() -> game.playCard("Ana", numRed7), game.GameIsOver);
+        assertThrowsLike(() -> game.playCard("Ana", numRed7), Game.GameIsOver);
     }
 
     @Test public void test22WildCallUnoEndsGame() {
