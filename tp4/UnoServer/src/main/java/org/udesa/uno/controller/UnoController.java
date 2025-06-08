@@ -4,10 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import org.udesa.uno.model.Card;
 import org.udesa.uno.model.JsonCard;
 import org.udesa.uno.service.UnoService;
 
@@ -26,28 +24,33 @@ public class UnoController {
 
     @GetMapping("/hola")
     public ResponseEntity<String> holaMundo(){
-        return new ResponseEntity<>("Bueenasssss", HttpStatus.OK);
+        return new ResponseEntity<>("Bueenasssss \n", HttpStatus.OK);
     }
 
     @PostMapping("newmatch")
     public ResponseEntity newMatch(@RequestParam List<String> players) {
         return ResponseEntity.ok(unoService.newMatch(players));
     }
-//
-//    @PostMapping("play/{matchId}/{player}")
-//    public ResponseEntity play(@PathVariable UUID matchId, @PathVariable String player, @RequestBody JsonCard card) {
-//    }
-//
-//    @PostMapping("draw/{matchId}/{player}")
-//    public ResponseEntity drawCard(@PathVariable UUID matchId, @RequestParam String player) {
-//    }
-//
-//    @GetMapping("activecard/{matchId}")
-//    public ResponseEntity activeCard(@PathVariable UUID matchId) {
-//    }
-//
-//    @GetMapping("playerhand/{matchId}")
-//    public ResponseEntity playerHand(@PathVariable UUID matchId) {
-//        return ResponseEntity.ok(unoService.playerHand(matchId).stream().map(each -> each.asJson()));
-//    }
+
+    @PostMapping("play/{matchId}/{player}")
+    public ResponseEntity<Void> play(@PathVariable UUID matchId, @PathVariable String player, @RequestBody JsonCard card) {
+        unoService.play(matchId, player, card);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("draw/{matchId}/{player}")
+    public ResponseEntity drawCard(@PathVariable UUID matchId, @PathVariable String player) {
+        unoService.drawCard(matchId, player);
+        return ResponseEntity.ok("\n");
+    }
+
+    @GetMapping("activecard/{matchId}")
+    public ResponseEntity activeCard(@PathVariable UUID matchId) {
+        return ResponseEntity.ok(unoService.activeCard(matchId).asJson());
+    }
+
+    @GetMapping("playerhand/{matchId}")
+    public ResponseEntity playerHand(@PathVariable UUID matchId) {
+        return ResponseEntity.ok(unoService.playerHand(matchId).stream().map(Card::asJson));
+    }
 }

@@ -2,6 +2,9 @@ package org.udesa.uno.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.udesa.uno.model.Card;
+import org.udesa.uno.model.GameStatus;
+import org.udesa.uno.model.JsonCard;
 import org.udesa.uno.model.Match;
 
 import java.util.HashMap;
@@ -21,4 +24,37 @@ public class UnoService {
         return newKey;
     }
 
+    public Match play(UUID matchId, String player, JsonCard card) {
+        Match match = sessions.getOrDefault(matchId, null);
+        if (match == null) {
+            throw new RuntimeException("Match not found");
+        }
+        match.play(player, card.asCard());
+        return match;
+    }
+
+    public List<Card> playerHand(UUID matchId) {
+        Match match = sessions.getOrDefault(matchId, null);
+        if (match == null) {
+            throw new RuntimeException("Match not found");
+        }
+        return match.playerHand();
+    }
+
+    public Card activeCard(UUID matchId) {
+        Match match = sessions.getOrDefault(matchId, null);
+        if (match == null) {
+            throw new RuntimeException("Match not found");
+        }
+        return match.activeCard();
+    }
+
+
+    public void drawCard(UUID matchId, String player) {
+        Match match = sessions.getOrDefault(matchId, null);
+        if (match == null) {
+            throw new RuntimeException("Match not found");
+        }
+        match.drawCard(player);
+    }
 }
