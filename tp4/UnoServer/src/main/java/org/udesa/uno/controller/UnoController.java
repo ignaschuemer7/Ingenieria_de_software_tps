@@ -11,6 +11,7 @@ import org.udesa.uno.service.UnoService;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 @Controller// Es el
 public class UnoController {
@@ -28,7 +29,7 @@ public class UnoController {
     }
 
     @PostMapping("newmatch")
-    public ResponseEntity newMatch(@RequestParam List<String> players) {
+    public ResponseEntity<UUID> newMatch(@RequestParam List<String> players) {
         return ResponseEntity.ok(unoService.newMatch(players));
     }
 
@@ -39,18 +40,18 @@ public class UnoController {
     }
 
     @PostMapping("draw/{matchId}/{player}")
-    public ResponseEntity drawCard(@PathVariable UUID matchId, @PathVariable String player) {
+    public ResponseEntity<Void> drawCard(@PathVariable UUID matchId, @PathVariable String player) {
         unoService.drawCard(matchId, player);
-        return ResponseEntity.ok("\n");
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("activecard/{matchId}")
-    public ResponseEntity activeCard(@PathVariable UUID matchId) {
+    public ResponseEntity<JsonCard> activeCard(@PathVariable UUID matchId) {
         return ResponseEntity.ok(unoService.activeCard(matchId).asJson());
     }
 
     @GetMapping("playerhand/{matchId}")
-    public ResponseEntity playerHand(@PathVariable UUID matchId) {
+    public ResponseEntity<Stream<JsonCard>> playerHand(@PathVariable UUID matchId) {
         return ResponseEntity.ok(unoService.playerHand(matchId).stream().map(Card::asJson));
     }
 }
