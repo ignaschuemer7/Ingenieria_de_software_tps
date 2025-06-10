@@ -18,16 +18,6 @@ public class UnoController {
     @Autowired
     UnoService unoService;
 
-//    @GetMapping("/")
-//    public String saludo() {
-//        return "index";
-//    }
-
-    @GetMapping("/hola")
-    public ResponseEntity<String> holaMundo(){
-        return new ResponseEntity<>("Bueenasssss \n", HttpStatus.OK);
-    }
-
     @PostMapping("newmatch")
     public ResponseEntity<UUID> newMatch(@RequestParam List<String> players) {
         return ResponseEntity.ok(unoService.newMatch(players));
