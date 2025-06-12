@@ -30,4 +30,5 @@ public class Dealer {
                         new NumberCard(color, 6), new NumberCard(color, 7),
                         new NumberCard(color, 8), new NumberCard(color, 9) );
     }
+
 }
