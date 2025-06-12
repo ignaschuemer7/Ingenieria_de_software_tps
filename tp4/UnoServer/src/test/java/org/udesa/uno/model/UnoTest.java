@@ -214,6 +214,17 @@ public class UnoTest {
         assertActiveCard( match, redDraw2 );
     }
 
+    @Test void testCannotCreateMatchWithLessThanTwoPlayers() {
+        assertThrowsLike( Match.twoPlayersMinToInitAGame,
+                () -> Match.newReducedMatch( deck(), "A" ) );
+    }
+
+    @Test void testCannotCreateMatchWithEmptyPlayerName() {
+        assertThrowsLike( Match.playerNameEmpty,
+                () -> Match.newReducedMatch( deck(), "A", "" ) );
+    }
+
+
     private static void assertActiveCard( Match match, Card card) {
         assertActiveCard( match, card, card.color() );
     }

@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.function.Function;
 
 public class Match {
+    public static String playerNameEmpty = "Player names cannot be empty";
+    public static String twoPlayersMinToInitAGame = "At least 2 players are required to start a game";
     public static String NotACardInHand = "Not a card in hand of ";
     public static String CardDoNotMatch = "Card does not match Color, Number or Kind";
     private Function<GameStatus, GameStatus> reverseShift;
@@ -20,23 +22,33 @@ public class Match {
         return new Match( new ArrayList( deck ), 7, players );
     }
 
-    public Match( List<Card> deck, int cardsInHand, List<String> players ) {
-        discardPileHead = deck.remove( 0 );
-        nextShift = (status) -> status.right();
-        reverseShift = (status) -> status.left();
-
-        Playing first = new Playing( players.getFirst(), new ArrayList( deck.subList( 0, cardsInHand ) ) );
-        deck.subList( 0, cardsInHand ).clear();
-
-        Playing st = first;
-        for ( String player: players.subList( 1, players.size() ) ) {
-            st = new Playing( st, player, new ArrayList( deck.subList( 0, cardsInHand ) ) );
-            deck.subList( 0, cardsInHand ).clear();
-        }
-        first.linkTo( st );
-        drawPile = deck;
-        status = first;
+public Match( List<Card> deck, int cardsInHand, List<String> players ) {
+    if (players.size() < 2) {
+        throw new IllegalArgumentException(twoPlayersMinToInitAGame);
     }
+
+    for (String player : players) {
+        if (player == null || player.trim().isEmpty()) {
+            throw new IllegalArgumentException(playerNameEmpty);
+        }
+    }
+
+    discardPileHead = deck.remove( 0 );
+    nextShift = (status) -> status.right();
+    reverseShift = (status) -> status.left();
+
+    Playing first = new Playing( players.getFirst(), new ArrayList( deck.subList( 0, cardsInHand ) ) );
+    deck.subList( 0, cardsInHand ).clear();
+
+    Playing st = first;
+    for ( String player: players.subList( 1, players.size() ) ) {
+        st = new Playing( st, player, new ArrayList( deck.subList( 0, cardsInHand ) ) );
+        deck.subList( 0, cardsInHand ).clear();
+    }
+    first.linkTo( st );
+    drawPile = deck;
+    status = first;
+}
 
     public void drawCard( String player ) {
         status.assertTurnOf( player );
