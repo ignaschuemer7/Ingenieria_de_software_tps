@@ -14,6 +14,7 @@ import java.util.UUID;
 
 @Service
 public class UnoService {
+    public static final String matchNotFound = "Match not found";
     @Autowired
     private Dealer dealer;
     private Map<UUID, Match> sessions = new HashMap<UUID, Match>();
@@ -51,7 +52,7 @@ public class UnoService {
 
     private void checkValidMatch(Match match) {
         if (match == null) {
-            throw new RuntimeException("Match not found");
+            throw new RuntimeException(matchNotFound);
         }
     }
 }

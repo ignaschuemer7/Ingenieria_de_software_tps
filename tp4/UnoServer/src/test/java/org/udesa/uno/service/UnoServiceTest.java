@@ -1,10 +1,6 @@
 package org.udesa.uno.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
@@ -14,7 +10,6 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -35,38 +30,22 @@ public class UnoServiceTest {
     @BeforeEach
     public void beforeEach() {
         validPlayers = Arrays.asList("Player1", "Player2", "Player3");
-        when(dealer.fullDeck())
-                .thenReturn(createMockDeck());
+        when(dealer.fullDeck()).thenReturn(createMockDeck());
     }
 
     @Test
     public void test01CanCreateNewMatchWithValidPlayers() {
         UUID matchId = unoService.newMatch(validPlayers);
-
         assertNotNull(matchId);
-
-        // Verify the match was created and the correct number of cards were dealt
-        Card activeCard = unoService.activeCard(matchId);
-        assertNotNull(activeCard);
-
-        List<Card> playerHand = unoService.playerHand(matchId);
-        assertNotNull(playerHand);
-        assertEquals(HAND_SIZE, playerHand.size());
+        assertNotNull(unoService.activeCard(matchId));
+        assertEquals(HAND_SIZE, unoService.playerHand(matchId).size());
     }
 
     @Test
     public void test02CanCreateMultipleIndependentMatchesAndHands() {
-        List<String> players1 = Arrays.asList("Alice", "Bob");
-        List<String> players2 = Arrays.asList("Charlie", "David");
-
-        UUID matchId1 = unoService.newMatch(players1);
-        UUID matchId2 = unoService.newMatch(players2);
-
-        assertNotNull(matchId1);
-        assertNotNull(matchId2);
-        assertFalse(matchId1.equals(matchId2));
-
-        // Both matches should be accessible independently with correct hand sizes
+        UUID matchId1 = unoService.newMatch(validPlayers);
+        UUID matchId2 = unoService.newMatch(validPlayers);
+        assertNotEquals(matchId1, matchId2);
         assertNotNull(unoService.activeCard(matchId1));
         assertNotNull(unoService.activeCard(matchId2));
         assertEquals(HAND_SIZE, unoService.playerHand(matchId1).size());
@@ -74,215 +53,93 @@ public class UnoServiceTest {
     }
 
     @Test
-    public void test03CanGetActiveCardFromValidMatch() {
+    public void test03CanNotGetActiveCardFromInvalidMatch() {
+        assertThrowsLike(() -> unoService.activeCard(UUID.randomUUID()), UnoService.matchNotFound);
+    }
+
+    @Test
+    public void test04CanNotGetPlayerHandFromInvalidMatch() {
+        assertThrowsLike(() -> unoService.playerHand(UUID.randomUUID()), UnoService.matchNotFound);
+    }
+
+    @Test
+    public void test05CanPlayNumberCardWithValidMatchAndPlayer() {
         UUID matchId = unoService.newMatch(validPlayers);
-
-        Card activeCard = unoService.activeCard(matchId);
-
-        assertNotNull(activeCard);
-    }
-
-    @Test
-    public void test04CanNotGetActiveCardFromInvalidMatch() {
-        UUID invalidMatchId = UUID.randomUUID();
-
-        assertThrowsLike(() -> unoService.activeCard(invalidMatchId),
-                "Match not found");
-    }
-
-    @Test
-    public void test05CanGetPlayerHandFromValidMatch() {
-        UUID matchId = unoService.newMatch(validPlayers);
-
-        List<Card> playerHand = unoService.playerHand(matchId);
-
-        assertNotNull(playerHand);
-        assertEquals(HAND_SIZE, playerHand.size());
-    }
-
-    @Test
-    public void test06CanNotGetPlayerHandFromInvalidMatch() {
-        UUID invalidMatchId = UUID.randomUUID();
-
-        assertThrowsLike(() -> unoService.playerHand(invalidMatchId),
-                "Match not found");
-    }
-
-    @Test
-    public void test07CanPlayNumberCardWithValidMatchAndPlayer() {
-        UUID matchId = unoService.newMatch(validPlayers);
-        String playerName = "Player1";
-
-        // Create a JsonCard for a number card
-        JsonCard numberCard = new JsonCard("Red", 2, "NumberCard", false);
-
-        unoService.play(matchId, playerName, numberCard);
-
-        // Verify the play was processed (no exception thrown)
+        unoService.play(matchId, "Player1", new JsonCard("Red", 2, "NumberCard", false));
         assertNotNull(unoService.activeCard(matchId));
     }
 
     @Test
-    public void test08CanPlaySkipCardWithValidMatchAndPlayer() {
+    public void test06CanPlaySkipCardWithValidMatchAndPlayer() {
         UUID matchId = unoService.newMatch(validPlayers);
-        String playerName = "Player1";
-
-        JsonCard skipCard = new JsonCard("Red", null, "SkipCard", false);
-
-        unoService.play(matchId, playerName, skipCard);
-
+        unoService.play(matchId, "Player1", new JsonCard("Red", null, "SkipCard", false));
         assertNotNull(unoService.activeCard(matchId));
     }
 
     @Test
-    public void test09CanPlayWildCardWithValidMatchAndPlayer() {
+    public void test07CanPlayWildCardWithValidMatchAndPlayer() {
         UUID matchId = unoService.newMatch(validPlayers);
-        String playerName = "Player1";
-
-        JsonCard wildCard = new JsonCard("Blue", null, "WildCard", false);
-
-        unoService.play(matchId, playerName, wildCard);
-
+        unoService.play(matchId, "Player1", new JsonCard("Blue", null, "WildCard", false));
         assertNotNull(unoService.activeCard(matchId));
     }
 
     @Test
-    public void test10CanNotPlayCardWithInvalidMatch() {
-        UUID invalidMatchId = UUID.randomUUID();
-        String playerName = "Player1";
-        JsonCard numberCard = new JsonCard("Red", 3, "NumberCard", false);
-
-        assertThrowsLike(() -> unoService.play(invalidMatchId, playerName, numberCard),
-                "Match not found");
+    public void test08CanNotPlayCardWithInvalidMatch() {
+        assertThrowsLike(() -> unoService.play(UUID.randomUUID(), "Player1", new JsonCard("Red", 2, "NumberCard", false)),
+                UnoService.matchNotFound);
     }
 
     @Test
-    public void test11CanDrawCardWithValidMatchAndPlayer() {
+    public void test09CanDrawCardWithValidMatchAndPlayer() {
         UUID matchId = unoService.newMatch(validPlayers);
-        String playerName = "Player1";
+        assertEquals(HAND_SIZE, unoService.playerHand(matchId).size());
+        unoService.drawCard(matchId, "Player1");
+        assertEquals(HAND_SIZE + 1, unoService.playerHand(matchId).size());
+    }
 
-        // Get initial hand size
-        List<Card> initialHand = unoService.playerHand(matchId);
-        int initialSize = initialHand.size();
-        assertEquals(HAND_SIZE, initialSize);
 
-        unoService.drawCard(matchId, playerName);
 
-        // Verify hand size increased
-        List<Card> newHand = unoService.playerHand(matchId);
-        assertEquals(initialSize + 1, newHand.size());
+    @Test
+    public void test10CanNotDrawCardWithInvalidMatch() {
+        assertThrowsLike(() -> unoService.drawCard(UUID.randomUUID(), "Player1"), UnoService.matchNotFound);
     }
 
     @Test
-    public void test12CanNotDrawCardWithInvalidMatch() {
-        UUID invalidMatchId = UUID.randomUUID();
-        String playerName = "Player1";
-
-        assertThrowsLike(() -> unoService.drawCard(invalidMatchId, playerName),
-                "Match not found");
-    }
-
-    @Test
-    public void test13MultipleDrawsIncreaseHandSizeCorrectly() {
+    public void test11CanPlayDraw2CardWithValidMatchAndPlayer() {
         UUID matchId = unoService.newMatch(validPlayers);
-        String playerName = "Player1";
-
-        List<Card> initialHand = unoService.playerHand(matchId);
-        int initialSize = initialHand.size();
-        assertEquals(HAND_SIZE, initialSize);
-
-        unoService.drawCard(matchId, playerName);
-        unoService.drawCard(matchId, playerName);
-        unoService.drawCard(matchId, playerName);
-
-        List<Card> finalHand = unoService.playerHand(matchId);
-        assertEquals(initialSize + 3, finalHand.size());
-    }
-
-    @Test
-    public void test14CanCreateMatchWithTwoPlayers() {
-        List<String> twoPlayers = Arrays.asList("Alice", "Bob");
-
-        UUID matchId = unoService.newMatch(twoPlayers);
-
-        assertNotNull(matchId);
+        unoService.play(matchId, "Player1", new JsonCard("Red", null, "Draw2Card", false));
         assertNotNull(unoService.activeCard(matchId));
-        List<Card> hand = unoService.playerHand(matchId);
-        assertNotNull(hand);
-        assertEquals(HAND_SIZE, hand.size());
     }
 
 
     @Test
-    public void test16SessionsRemainIndependentAfterOperations() {
-        List<String> players1 = Arrays.asList("Alice", "Bob");
-        List<String> players2 = Arrays.asList("Charlie", "David");
+    public void test12SessionsRemainIndependentAfterOperations() {
+        UUID matchId1 = unoService.newMatch(Arrays.asList("Alice", "Bob"));
+        UUID matchId2 = unoService.newMatch(Arrays.asList("Charlie", "David"));
 
-        UUID matchId1 = unoService.newMatch(players1);
-        UUID matchId2 = unoService.newMatch(players2);
-
-        // Perform operations on first match
         unoService.drawCard(matchId1, "Alice");
         unoService.drawCard(matchId1, "Alice");
+        unoService.play(matchId2, "Charlie", new JsonCard("Red", null, "SkipCard", false));
 
-        // Play a card in second match
-        JsonCard skipCard = new JsonCard("Red", null, "SkipCard", false);
-        unoService.play(matchId2, "Charlie", skipCard);
-
-        // Both matches should still be accessible and independent
-        List<Card> hand1 = unoService.playerHand(matchId1);
-        List<Card> hand2 = unoService.playerHand(matchId2);
-
-        assertNotNull(hand1);
-        assertNotNull(hand2);
-        assertNotNull(unoService.activeCard(matchId1));
-        assertNotNull(unoService.activeCard(matchId2));
-        assertEquals(HAND_SIZE + 2, hand1.size());
-        assertEquals(HAND_SIZE - 1, hand2.size());
+        assertEquals(HAND_SIZE + 2, unoService.playerHand(matchId1).size());
+        assertEquals(HAND_SIZE - 1, unoService.playerHand(matchId2).size());
     }
 
+
+
     @Test
-    public void test17CanPlayDraw2CardWithValidMatchAndPlayer() {
+    public void test13CanPlayReverseCardWithValidMatchAndPlayer() {
         UUID matchId = unoService.newMatch(validPlayers);
-
-        JsonCard draw2Card = new JsonCard("Red", null, "Draw2Card", false);
-
-        unoService.play(matchId, "Player1", draw2Card);
-
+        unoService.play(matchId, "Player1", new JsonCard("Red", null, "ReverseCard", false));
         assertNotNull(unoService.activeCard(matchId));
     }
 
     @Test
-    public void test18CanPlayReverseCardWithValidMatchAndPlayer() {
+    public void test14ConsecutiveOperationsOnSameMatchWork() {
         UUID matchId = unoService.newMatch(validPlayers);
-        String playerName = "Player1";
-
-        JsonCard reverseCard = new JsonCard("Red", null, "ReverseCard", false);
-
-        unoService.play(matchId, playerName, reverseCard);
-
-        assertNotNull(unoService.activeCard(matchId));
-    }
-
-
-    @Test
-    public void test19ConsecutiveOperationsOnSameMatchWork() {
-        UUID matchId = unoService.newMatch(validPlayers);
-        String player1 = "Player1";
-        String player2 = "Player2";
-
-        // Draw cards for player1
-        JsonCard wildCard = new JsonCard("Blue", null, "WildCard", false);
-        unoService.play(matchId, player1, wildCard);
-
-        // Play a card with player2
-        JsonCard numberCard = new JsonCard("Blue", null, "SkipCard", false);
-        unoService.play(matchId, player2, numberCard);
-
-        // Draw more cards for player1
-        unoService.drawCard(matchId, player1);
-
-        // All operations should work without interfering with each other
+        unoService.play(matchId, "Player1", new JsonCard("Blue", null, "WildCard", false));
+        unoService.play(matchId, "Player2", new JsonCard("Blue", null, "SkipCard", false));
+        unoService.drawCard(matchId, "Player1");
         assertNotNull(unoService.activeCard(matchId));
         assertNotNull(unoService.playerHand(matchId));
     }
@@ -294,7 +151,6 @@ public class UnoServiceTest {
     }
 
     private List<Card> createMockDeck() {
-        // Create a mock deck similar to what Dealer would create
         return Arrays.asList(
                 new NumberCard("Red", 1),
                 new NumberCard("Red", 2),
@@ -314,7 +170,6 @@ public class UnoServiceTest {
                 new Draw2Card("Red"),
                 new Draw2Card("Blue"),
                 new WildCard(),
-                // Add more cards to ensure sufficient deck size
                 new NumberCard("Red", 1),
                 new NumberCard("Blue", 2),
                 new NumberCard("Green", 3),
