@@ -18,6 +18,16 @@ public class UnoController {
     @Autowired
     UnoService unoService;
 
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<String> handleRuntime(RuntimeException exception) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body( "Error: " + exception.getMessage() );
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleIllegal(IllegalArgumentException exception){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body( "Error: " + exception.getMessage() );
+    }
+
     @PostMapping("newmatch")
     public ResponseEntity<UUID> newMatch(@RequestParam List<String> players) {
         return ResponseEntity.ok(unoService.newMatch(players));
