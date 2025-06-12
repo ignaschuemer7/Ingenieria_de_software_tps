@@ -13,16 +13,10 @@ public class Dealer {
 
     public List<Card> fullDeck() {
         ArrayList<Card> deck = new ArrayList<>();
-        //Agegar cartas de color Red
         deck.addAll( cardsOn("Red") );
-        //Agregar cartas de color Green
         deck.addAll( cardsOn("Green") );
-        //Agregar cartas de color Blue
         deck.addAll( cardsOn("Blue") );
-        //Agregar cartas de color Yellow
         deck.addAll( cardsOn("Yellow") );
-
-        //Mezclar
         Collections.shuffle(deck);
         return deck;
     }
