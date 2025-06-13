@@ -1,5 +1,6 @@
 package org.udesa.uno.controller;
 
+import org.apache.logging.log4j.util.InternalException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ public class UnoController {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<String> handleRuntime(RuntimeException exception) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body( "Error: " + exception.getMessage() );
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body( "Error: " + exception.getMessage() );
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
