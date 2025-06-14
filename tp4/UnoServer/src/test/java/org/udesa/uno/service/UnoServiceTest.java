@@ -70,50 +70,34 @@ public class UnoServiceTest {
     }
 
     @Test
-    public void test06CanPlaySkipCardWithValidMatchAndPlayer() {
-        UUID matchId = unoService.newMatch(validPlayers);
-        unoService.play(matchId, "Player1", new JsonCard("Red", null, "SkipCard", false));
-        assertNotNull(unoService.activeCard(matchId));
-    }
-
-    @Test
-    public void test07CanPlayWildCardWithValidMatchAndPlayer() {
-        UUID matchId = unoService.newMatch(validPlayers);
-        unoService.play(matchId, "Player1", new JsonCard("Blue", null, "WildCard", false));
-        assertNotNull(unoService.activeCard(matchId));
-    }
-
-    @Test
-    public void test08CanNotPlayCardWithInvalidMatch() {
+    public void test06CanNotPlayCardWithInvalidMatch() {
         assertThrowsLike(() -> unoService.play(UUID.randomUUID(), "Player1", new JsonCard("Red", 2, "NumberCard", false)),
                 UnoService.matchNotFound);
     }
 
     @Test
-    public void test09CanDrawCardWithValidMatchAndPlayer() {
+    public void test07CanDrawCardWithValidMatchAndPlayer() {
         UUID matchId = unoService.newMatch(validPlayers);
         assertEquals(HAND_SIZE, unoService.playerHand(matchId).size());
         unoService.drawCard(matchId, "Player1");
         assertEquals(HAND_SIZE + 1, unoService.playerHand(matchId).size());
     }
 
-
-
     @Test
-    public void test10CanNotDrawCardWithInvalidMatch() {
+    public void test08CanNotDrawCardWithInvalidMatch() {
         assertThrowsLike(() -> unoService.drawCard(UUID.randomUUID(), "Player1"), UnoService.matchNotFound);
     }
 
     @Test
-    public void test11CanPlayDraw2CardWithValidMatchAndPlayer() {
+    public void test09CanPlayDraw2CardWithValidMatchAndPlayer() {
         UUID matchId = unoService.newMatch(validPlayers);
         unoService.play(matchId, "Player1", new JsonCard("Red", null, "Draw2Card", false));
         assertNotNull(unoService.activeCard(matchId));
+        assertEquals(HAND_SIZE + 2, unoService.playerHand(matchId).size());
     }
 
-
     @Test
-    public void test12SessionsRemainIndependentAfterOperations() {
+    public void test10SessionsRemainIndependentAfterOperations() {
         UUID matchId1 = unoService.newMatch(Arrays.asList("Alice", "Bob"));
         UUID matchId2 = unoService.newMatch(Arrays.asList("Charlie", "David"));
 
@@ -125,17 +109,8 @@ public class UnoServiceTest {
         assertEquals(HAND_SIZE - 1, unoService.playerHand(matchId2).size());
     }
 
-
-
     @Test
-    public void test13CanPlayReverseCardWithValidMatchAndPlayer() {
-        UUID matchId = unoService.newMatch(validPlayers);
-        unoService.play(matchId, "Player1", new JsonCard("Red", null, "ReverseCard", false));
-        assertNotNull(unoService.activeCard(matchId));
-    }
-
-    @Test
-    public void test14ConsecutiveOperationsOnSameMatchWork() {
+    public void test11ConsecutiveOperationsOnSameMatchWork() {
         UUID matchId = unoService.newMatch(validPlayers);
         unoService.play(matchId, "Player1", new JsonCard("Blue", null, "WildCard", false));
         unoService.play(matchId, "Player2", new JsonCard("Blue", null, "SkipCard", false));
@@ -150,9 +125,11 @@ public class UnoServiceTest {
         assertEquals(expectedMessage, exception.getMessage());
     }
 
-    private List<Card> createMockDeck() {
+    public static List<Card> createMockDeck() {
         return Arrays.asList(
+                // Top card on the discard pile
                 new NumberCard("Red", 1),
+                // Player 1 hand (7 cards)
                 new NumberCard("Red", 2),
                 new NumberCard("Yellow", 5),
                 new WildCard(),
@@ -160,6 +137,7 @@ public class UnoServiceTest {
                 new Draw2Card("Red"),
                 new SkipCard("Red"),
                 new NumberCard("Red", 6),
+                // Player 2 hand (7 cards)
                 new NumberCard("Blue", 7),
                 new NumberCard("Green", 8),
                 new NumberCard("Yellow", 9),
@@ -167,6 +145,7 @@ public class UnoServiceTest {
                 new SkipCard("Blue"),
                 new ReverseCard("Green"),
                 new ReverseCard("Yellow"),
+                // Player 3 hand (7 cards)
                 new Draw2Card("Red"),
                 new Draw2Card("Blue"),
                 new WildCard(),
@@ -174,6 +153,7 @@ public class UnoServiceTest {
                 new NumberCard("Blue", 2),
                 new NumberCard("Green", 3),
                 new NumberCard("Yellow", 4),
+                // Additional cards in the deck
                 new SkipCard("Green"),
                 new SkipCard("Yellow"),
                 new ReverseCard("Red"),

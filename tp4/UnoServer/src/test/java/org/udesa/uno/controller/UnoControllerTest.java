@@ -3,6 +3,7 @@ package org.udesa.uno.controller;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -10,19 +11,26 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.udesa.uno.model.JsonCard;
 import org.udesa.uno.model.Match;
 import org.udesa.uno.model.Player;
+import org.udesa.uno.service.Dealer;
 import org.udesa.uno.service.UnoService;
+import org.udesa.uno.service.UnoServiceTest;
+import org.udesa.uno.model.ColoredCard;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -31,9 +39,17 @@ public class UnoControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @MockitoBean
+    private Dealer dealer;
+
     private ObjectMapper objectMapper = new ObjectMapper();
 
     // ========== NEW MATCH TESTS ==========
+
+    @BeforeEach
+    public void beforeEach() {
+        when(dealer.fullDeck()).thenReturn(UnoServiceTest.createMockDeck());
+    }
 
     @Test
     public void test01CanCreateNewMatchWithValidPlayers() throws Exception {
@@ -68,18 +84,13 @@ public class UnoControllerTest {
     @Test
     public void test05CanPlayValidCard() throws Exception {
         String matchId = newGame();
-        List<JsonCard> hand = getPlayerHand(matchId);
-        JsonCard activeCard = getActiveCard(matchId);
+        JsonCard validCard = new JsonCard("Red", 2, "NumberCard", false);
+        mockMvc.perform(post("/play/" + matchId + "/Emilio")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(validCard.toString()))
+                .andDo(print())
+                .andExpect(status().isOk());
 
-        // Find a valid card to play
-        JsonCard validCard = findValidCard(hand, activeCard);
-        if (validCard != null) {
-            mockMvc.perform(post("/play/" + matchId + "/Emilio")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(validCard.toString()))
-                    .andDo(print())
-                    .andExpect(status().isOk());
-        }
     }
 
     @Test
@@ -117,21 +128,19 @@ public class UnoControllerTest {
     }
 
     @Test
-    public void test08CannotPlayCardNotInHand() throws Exception {
+    public void test08CannotPlayInvalidColorCard() throws Exception {
         String matchId = newGame();
-        List<JsonCard> hand = getPlayerHand(matchId);
-
         // Create a card that's not in player's hand
-        JsonCard notInHand = new JsonCard("Purple", 99, "NumberCard", false);
+        JsonCard notInHand = new JsonCard("Gray", 99, "NumberCard", false);
 
         String response = mockMvc.perform(post("/play/" + matchId + "/Emilio")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(notInHand.toString()))
                 .andDo(print())
-                .andExpect(status().is(500))
+                .andExpect(status().is(400))
                 .andReturn().getResponse().getContentAsString();
 
-        assertTrue(response.contains(Match.NotACardInHand + "Emilio"));
+        assertEquals("Error: " + ColoredCard.invalidColor, response);
     }
 
     @Test

@@ -21,12 +21,12 @@ public class UnoController {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<String> handleRuntime(RuntimeException exception) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body( "Error: " + exception.getMessage() );
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body( "Error Internal Server Error: " + exception.getMessage() );
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<String> handleIllegal(IllegalArgumentException exception){
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body( "Error: " + exception.getMessage() );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body( "Error Illegal Argument: " + exception.getMessage() );
     }
 
     @PostMapping("newmatch")

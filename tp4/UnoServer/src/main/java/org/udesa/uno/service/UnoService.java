@@ -25,34 +25,29 @@ public class UnoService {
         return newKey;
     }
 
+    private Match getMatch(UUID matchId) {
+        Match match = sessions.get(matchId);
+        if (match == null) {
+            throw new RuntimeException(matchNotFound);
+        }
+        return match;
+    }
+
     public Match play(UUID matchId, String player, JsonCard card) {
-        Match match = sessions.getOrDefault(matchId, null);
-        checkValidMatch(match);
+        Match match = getMatch(matchId);
         match.play(player, card.asCard());
         return match;
     }
 
     public List<Card> playerHand(UUID matchId) {
-        Match match = sessions.getOrDefault(matchId, null);
-        checkValidMatch(match);
-        return match.playerHand();
+        return getMatch(matchId).playerHand();
     }
 
     public Card activeCard(UUID matchId) {
-        Match match = sessions.getOrDefault(matchId, null);
-        checkValidMatch(match);
-        return match.activeCard();
+        return getMatch(matchId).activeCard();
     }
 
     public void drawCard(UUID matchId, String player) {
-        Match match = sessions.getOrDefault(matchId, null);
-        checkValidMatch(match);
-        match.drawCard(player);
-    }
-
-    private void checkValidMatch(Match match) {
-        if (match == null) {
-            throw new RuntimeException(matchNotFound);
-        }
+        getMatch(matchId).drawCard(player);
     }
 }
