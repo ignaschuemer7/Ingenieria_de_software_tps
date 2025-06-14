@@ -25,14 +25,6 @@ public class UnoService {
         return newKey;
     }
 
-    private Match getMatch(UUID matchId) {
-        Match match = sessions.get(matchId);
-        if (match == null) {
-            throw new RuntimeException(matchNotFound);
-        }
-        return match;
-    }
-
     public Match play(UUID matchId, String player, JsonCard card) {
         Match match = getMatch(matchId);
         match.play(player, card.asCard());
@@ -49,5 +41,13 @@ public class UnoService {
 
     public void drawCard(UUID matchId, String player) {
         getMatch(matchId).drawCard(player);
+    }
+
+    private Match getMatch(UUID matchId) {
+        Match match = sessions.get(matchId);
+        if (match == null) {
+            throw new RuntimeException(matchNotFound);
+        }
+        return match;
     }
 }

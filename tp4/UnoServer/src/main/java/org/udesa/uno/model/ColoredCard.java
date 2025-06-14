@@ -7,10 +7,10 @@ public abstract class ColoredCard extends Card {
     public static final String invalidColor = "Invalid color";
     protected String color = "";
 
-    private static final Set<String> VALID_COLORS = Set.of("Red", "Yellow", "Green", "Blue");
+    private static final Set<String> validColors = Set.of("Red", "Yellow", "Green", "Blue");
 
     public ColoredCard(String aColor) {
-        if (!VALID_COLORS.contains(aColor)) {
+        if (!validColors.contains(aColor)) {
             throw new IllegalArgumentException(invalidColor);
         }
         this.color = aColor;
