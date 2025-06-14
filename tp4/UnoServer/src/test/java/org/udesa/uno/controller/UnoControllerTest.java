@@ -12,7 +12,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -195,7 +194,7 @@ import org.udesa.uno.service.UnoServiceTest;
         // ========== HELPER METHODS ==========
 
         private String newMatch(String... players) throws Exception {
-            StringBuilder urlBuilder = getUrlBuilder(players);
+            StringBuilder urlBuilder = getNewMatchUrlBuilder(players);
 
             return mockMvc.perform(post(urlBuilder.toString()))
                     .andDo(print())
@@ -207,14 +206,14 @@ import org.udesa.uno.service.UnoServiceTest;
         }
 
         private void newMatchFailing(String... players) throws Exception {
-            StringBuilder urlBuilder = getUrlBuilder(players);
+            StringBuilder urlBuilder = getNewMatchUrlBuilder(players);
 
             mockMvc.perform(post(urlBuilder.toString()))
                         .andDo(print())
                         .andExpect(status().is(400));
             }
 
-        private static StringBuilder getUrlBuilder(String[] players) {
+        private static StringBuilder getNewMatchUrlBuilder(String[] players) {
             StringBuilder urlBuilder = new StringBuilder("/newmatch");
             for (int i = 0; i < players.length; i++) {
                 urlBuilder.append(i == 0 ? "?" : "&");
