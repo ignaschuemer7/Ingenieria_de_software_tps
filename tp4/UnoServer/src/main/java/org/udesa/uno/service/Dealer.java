@@ -12,23 +12,35 @@ import java.util.ArrayList;
 public class Dealer {
 
     public List<Card> fullDeck() {
-        ArrayList<Card> deck = new ArrayList<>();
-        deck.addAll( cardsOn("Red") );
-        deck.addAll( cardsOn("Green") );
-        deck.addAll( cardsOn("Blue") );
-        deck.addAll( cardsOn("Yellow") );
+        List<Card> deck = new ArrayList<>();
+        String[] colors = { "Red", "Green", "Blue", "Yellow" };
+        for (String color : colors) {
+            deck.addAll(cardsOn(color));
+        }
+        // Add 4 WildCards
+        for (int i = 0; i < 4; i++) {
+            deck.add(new WildCard());
+        }
         Collections.shuffle(deck);
         return deck;
     }
 
     private List<Card> cardsOn(String color) {
-        return List.of( new WildCard(), new SkipCard(color),
-                        new Draw2Card(color), new ReverseCard(color),
-                        new NumberCard(color, 1),
-                        new NumberCard(color, 2), new NumberCard(color, 3),
-                        new NumberCard(color, 4), new NumberCard(color, 5),
-                        new NumberCard(color, 6), new NumberCard(color, 7),
-                        new NumberCard(color, 8), new NumberCard(color, 9) );
+        List<Card> cards = new ArrayList<>();
+        // One ZeroCard per color
+        cards.add(new NumberCard(color, 0));
+        // Two NumberCards from 1 to 9 per color
+        for (int i = 1; i <= 9; i++) {
+            cards.add(new NumberCard(color, i));
+            cards.add(new NumberCard(color, i));
+        }
+        // Two Draw2, Reverse, and Skip cards per color
+        for (int i = 0; i < 2; i++) {
+            cards.add(new Draw2Card(color));
+            cards.add(new ReverseCard(color));
+            cards.add(new SkipCard(color));
+        }
+        return cards;
     }
 
 }
