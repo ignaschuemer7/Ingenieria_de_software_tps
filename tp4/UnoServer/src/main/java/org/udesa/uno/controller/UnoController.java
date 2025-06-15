@@ -30,11 +30,6 @@ public class UnoController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body( "Error Illegal Argument: " + exception.getMessage() );
     }
 
-//    @ExceptionHandler({ClassNotFoundException.class, NoSuchMethodException.class, InvocationTargetException.class})
-//    public ResponseEntity<String> handleReflectionExceptions(Exception exception) {
-//        return ResponseEntity.status( HttpStatus.NOT_FOUND ).body( "Error: JSON Parse Error: " + exception.getMessage() );
-//    }
-
     @PostMapping("newmatch")
     public ResponseEntity<UUID> newMatch(@RequestParam List<String> players) {
         return ResponseEntity.ok(unoService.newMatch(players));

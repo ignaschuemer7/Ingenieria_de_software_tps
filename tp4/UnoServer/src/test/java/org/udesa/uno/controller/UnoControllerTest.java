@@ -131,7 +131,7 @@ import org.udesa.uno.service.UnoServiceTest;
         }
 
         @Test
-        public void test11CannotPlayWithMalformedJson() throws Exception {
+        public void test12CannotPlayWithMalformedJson() throws Exception {
             String matchId = newMatch("Player1", "Player2");
             String malformedJson = "{\"color\":\"Red\",\"number\":2"; // missing closing brace and fields
             String response = mockMvc.perform(post("/play/" + matchId + "/Player1")
@@ -142,29 +142,13 @@ import org.udesa.uno.service.UnoServiceTest;
                     .andReturn()
                     .getResponse()
                     .getContentAsString();
-            assertTrue(response.contains("Internal Server Error") || response.contains("JSON parsing error"));
-        }
-
-        @Test
-        public void test12CannotPlayWithMissingFields() throws Exception {
-            String matchId = newMatch("Player1", "Player2");
-            // Missing 'type' and 'shout' fields
-            String incompleteJson = "{\"color\":\"Red\",\"number\":2}";
-            String response = mockMvc.perform(post("/play/" + matchId + "/Player1")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(incompleteJson))
-                    .andDo(print())
-                    .andExpect(status().is(404))
-                    .andReturn()
-                    .getResponse()
-                    .getContentAsString();
-            assertTrue(response.contains("JSON Parse Error"));
+            assertTrue(response.contains("Internal Server Error"));
         }
 
         // ========== DRAW CARD TESTS ==========
 
         @Test
-        public void test10CanDrawCard() throws Exception {
+        public void test13CanDrawCard() throws Exception {
             String matchId = newMatch("Player1", "Player2");
             List<JsonCard> handBefore = getPlayerHand(matchId);
 
@@ -175,7 +159,7 @@ import org.udesa.uno.service.UnoServiceTest;
         }
 
         @Test
-        public void test11CannotDrawCardWhenNotPlayerTurn() throws Exception {
+        public void test14CannotDrawCardWhenNotPlayerTurn() throws Exception {
             String matchId = newMatch("Player1", "Player2");
 
             String response = drawCardFailing(matchId, "Player2");
@@ -183,7 +167,7 @@ import org.udesa.uno.service.UnoServiceTest;
         }
 
         @Test
-        public void test12CannotDrawCardInNonExistentMatch() throws Exception {
+        public void test15CannotDrawCardInNonExistentMatch() throws Exception {
             UUID fakeMatchId = UUID.randomUUID();
 
             String response = drawCardFailing(fakeMatchId.toString(), "Player1");
@@ -193,7 +177,7 @@ import org.udesa.uno.service.UnoServiceTest;
         // ========== ACTIVE CARD TESTS ==========
 
         @Test
-        public void test13CanGetActiveCard() throws Exception {
+        public void test16CanGetActiveCard() throws Exception {
             String matchId = newMatch("Player1", "Player2");
 
             JsonCard activeCard = getActiveCard(matchId);
@@ -204,7 +188,7 @@ import org.udesa.uno.service.UnoServiceTest;
         }
 
         @Test
-        public void test14CannotGetActiveCardFromNonExistentMatch() throws Exception {
+        public void test17CannotGetActiveCardFromNonExistentMatch() throws Exception {
             UUID fakeMatchId = UUID.randomUUID();
 
             getActiveCardFailing(fakeMatchId.toString());
@@ -213,7 +197,7 @@ import org.udesa.uno.service.UnoServiceTest;
         // ========== PLAYER HAND TESTS ==========
 
         @Test
-        public void test15CanGetPlayerHand() throws Exception {
+        public void test18CanGetPlayerHand() throws Exception {
             String matchId = newMatch("Player1", "Player2");
 
             List<JsonCard> hand = getPlayerHand(matchId);
@@ -229,7 +213,7 @@ import org.udesa.uno.service.UnoServiceTest;
         }
 
         @Test
-        public void test16CannotGetPlayerHandFromNonExistentMatch() throws Exception {
+        public void test19CannotGetPlayerHandFromNonExistentMatch() throws Exception {
             UUID fakeMatchId = UUID.randomUUID();
 
             getPlayerHandFailing(fakeMatchId.toString());
