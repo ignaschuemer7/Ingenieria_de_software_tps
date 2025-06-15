@@ -22,7 +22,7 @@ public class UnoController {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<String> handleRuntime(RuntimeException exception) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body( "Error Internal Server Error: " + exception.getMessage() );
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body( "Internal Server Error: " + exception.getMessage() );
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
