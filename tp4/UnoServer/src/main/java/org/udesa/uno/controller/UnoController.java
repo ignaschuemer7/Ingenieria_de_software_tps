@@ -10,6 +10,7 @@ import org.udesa.uno.model.Card;
 import org.udesa.uno.model.JsonCard;
 import org.udesa.uno.service.UnoService;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -28,6 +29,11 @@ public class UnoController {
     public ResponseEntity<String> handleIllegal(IllegalArgumentException exception){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body( "Error Illegal Argument: " + exception.getMessage() );
     }
+
+//    @ExceptionHandler({ClassNotFoundException.class, NoSuchMethodException.class, InvocationTargetException.class})
+//    public ResponseEntity<String> handleReflectionExceptions(Exception exception) {
+//        return ResponseEntity.status( HttpStatus.NOT_FOUND ).body( "Error: JSON Parse Error: " + exception.getMessage() );
+//    }
 
     @PostMapping("newmatch")
     public ResponseEntity<UUID> newMatch(@RequestParam List<String> players) {

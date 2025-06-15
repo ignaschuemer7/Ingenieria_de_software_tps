@@ -69,10 +69,15 @@ import org.udesa.uno.service.UnoServiceTest;
             newMatchFailing("ValidPlayer", "");
         }
 
+        @Test
+        public void test05NoPlayersParams() throws Exception {
+            newMatchFailing();
+        }
+
         // ========== PLAY CARD TESTS ==========
 
         @Test
-        public void test05CanPlayValidCard() throws Exception {
+        public void test06CanPlayValidCard() throws Exception {
             String matchId = newMatch("Player1", "Player2");
             // From our deterministic deck, Player1 has Red 2 which can be played on Red 1
             JsonCard validCard = new JsonCard("Red", 2, "NumberCard", false);
@@ -80,7 +85,7 @@ import org.udesa.uno.service.UnoServiceTest;
         }
 
         @Test
-        public void test06CannotPlayCardWhenNotPlayerTurn() throws Exception {
+        public void test07CannotPlayCardWhenNotPlayerTurn() throws Exception {
             String matchId = newMatch("Player1", "Player2");
             JsonCard anyCard = new JsonCard("Red", 2, "NumberCard", false);
 
@@ -89,7 +94,7 @@ import org.udesa.uno.service.UnoServiceTest;
         }
 
         @Test
-        public void test07CannotPlayInvalidCard() throws Exception {
+        public void test08CannotPlayInvalidCard() throws Exception {
             String matchId = newMatch("Player1", "Player2");
             // Create a card that Player1 doesn't have in hand
             JsonCard invalidCard = new JsonCard("Green", 9, "NumberCard", false);
@@ -99,7 +104,7 @@ import org.udesa.uno.service.UnoServiceTest;
         }
 
         @Test
-        public void test08CannotPlayInvalidColorCard() throws Exception {
+        public void test09CannotPlayInvalidColorCard() throws Exception {
             String matchId = newMatch("Player1", "Player2");
             JsonCard invalidColorCard = new JsonCard("Gray", 99, "NumberCard", false);
 
@@ -108,12 +113,52 @@ import org.udesa.uno.service.UnoServiceTest;
         }
 
         @Test
-        public void test09CannotPlayInNonExistentMatch() throws Exception {
+        public void test10CannotPlayInNonExistentMatch() throws Exception {
             UUID fakeMatchId = UUID.randomUUID();
             JsonCard anyCard = new JsonCard("Red", 5, "NumberCard", false);
 
             String response = playCardFailingInternal(fakeMatchId.toString(), "Player1", anyCard);
             assertTrue(response.contains(UnoService.matchNotFound));
+        }
+
+        @Test
+        public void test11CannotPlayInvalidPlayer() throws Exception {
+            String matchId = newMatch("Player1", "Player2");
+            // From our deterministic deck, Player1 has Red 2 which can be played on Red 1
+            JsonCard validCard = new JsonCard("Red", 2, "NumberCard", false);
+            String response = playCardFailingInternal(matchId, "InvalidPlayer", validCard);
+            assertTrue(response.contains(Player.NotPlayersTurn + "InvalidPlayer"));
+        }
+
+        @Test
+        public void test11CannotPlayWithMalformedJson() throws Exception {
+            String matchId = newMatch("Player1", "Player2");
+            String malformedJson = "{\"color\":\"Red\",\"number\":2"; // missing closing brace and fields
+            String response = mockMvc.perform(post("/play/" + matchId + "/Player1")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(malformedJson))
+                    .andDo(print())
+                    .andExpect(status().is(500))
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+            assertTrue(response.contains("Internal Server Error") || response.contains("JSON parsing error"));
+        }
+
+        @Test
+        public void test12CannotPlayWithMissingFields() throws Exception {
+            String matchId = newMatch("Player1", "Player2");
+            // Missing 'type' and 'shout' fields
+            String incompleteJson = "{\"color\":\"Red\",\"number\":2}";
+            String response = mockMvc.perform(post("/play/" + matchId + "/Player1")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(incompleteJson))
+                    .andDo(print())
+                    .andExpect(status().is(404))
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+            assertTrue(response.contains("JSON Parse Error"));
         }
 
         // ========== DRAW CARD TESTS ==========
