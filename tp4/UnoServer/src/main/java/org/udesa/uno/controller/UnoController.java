@@ -26,7 +26,7 @@ public class UnoController {
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<String> handleIllegal(IllegalArgumentException exception){
+    public ResponseEntity<String> handleIllegalArgument(IllegalArgumentException exception){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body( "Error Illegal Argument: " + exception.getMessage() );
     }
 

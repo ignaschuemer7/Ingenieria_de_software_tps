@@ -25,7 +25,7 @@ public class UnoServiceTest {
     private Dealer dealer;
 
     private List<String> validPlayers;
-    private static final int HAND_SIZE = 7;
+    private static final int handSize = 7;
 
     @BeforeEach
     public void beforeEach() {
@@ -38,7 +38,7 @@ public class UnoServiceTest {
         UUID matchId = unoService.newMatch(validPlayers);
         assertNotNull(matchId);
         assertNotNull(unoService.activeCard(matchId));
-        assertEquals(HAND_SIZE, unoService.playerHand(matchId).size());
+        assertEquals(handSize, unoService.playerHand(matchId).size());
     }
 
     @Test
@@ -48,8 +48,8 @@ public class UnoServiceTest {
         assertNotEquals(matchId1, matchId2);
         assertNotNull(unoService.activeCard(matchId1));
         assertNotNull(unoService.activeCard(matchId2));
-        assertEquals(HAND_SIZE, unoService.playerHand(matchId1).size());
-        assertEquals(HAND_SIZE, unoService.playerHand(matchId2).size());
+        assertEquals(handSize, unoService.playerHand(matchId1).size());
+        assertEquals(handSize, unoService.playerHand(matchId2).size());
     }
 
     @Test
@@ -71,16 +71,16 @@ public class UnoServiceTest {
 
     @Test
     public void test06CanNotPlayCardWithInvalidMatch() {
-        assertThrowsLike(() -> unoService.play(UUID.randomUUID(), "Player1", new JsonCard("Red", 2, "NumberCard", false)),
+        assertThrowsLike(() -> unoService.play(UUID.randomUUID(), "Player1", new JsonCard("Red", null, "ReverseCard", false)),
                 UnoService.matchNotFound);
     }
 
     @Test
     public void test07CanDrawCardWithValidMatchAndPlayer() {
         UUID matchId = unoService.newMatch(validPlayers);
-        assertEquals(HAND_SIZE, unoService.playerHand(matchId).size());
+        assertEquals(handSize, unoService.playerHand(matchId).size());
         unoService.drawCard(matchId, "Player1");
-        assertEquals(HAND_SIZE + 1, unoService.playerHand(matchId).size());
+        assertEquals(handSize + 1, unoService.playerHand(matchId).size());
     }
 
     @Test
@@ -93,7 +93,7 @@ public class UnoServiceTest {
         UUID matchId = unoService.newMatch(validPlayers);
         unoService.play(matchId, "Player1", new JsonCard("Red", null, "Draw2Card", false));
         assertNotNull(unoService.activeCard(matchId));
-        assertEquals(HAND_SIZE + 2, unoService.playerHand(matchId).size());
+        assertEquals(handSize + 2, unoService.playerHand(matchId).size());
     }
 
     @Test
@@ -105,8 +105,8 @@ public class UnoServiceTest {
         unoService.drawCard(matchId1, "Alice");
         unoService.play(matchId2, "Charlie", new JsonCard("Red", null, "SkipCard", false));
 
-        assertEquals(HAND_SIZE + 2, unoService.playerHand(matchId1).size());
-        assertEquals(HAND_SIZE - 1, unoService.playerHand(matchId2).size());
+        assertEquals(handSize + 2, unoService.playerHand(matchId1).size());
+        assertEquals(handSize - 1, unoService.playerHand(matchId2).size());
     }
 
     @Test
